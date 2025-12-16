@@ -9,10 +9,11 @@ datasource db {
 }
 
 model Race {
-  id          String   @id @default(cuid())
-  title       String
-  titleEn     String?  @map("title_en")
-  description String?  @db.Text
+  id    String @id @default(cuid())
+  title String
+
+  // Source
+  sourceUrl String? @unique @map("source_url") // 크롤링 원본 URL
 
   // Date & Time
   eventDate DateTime @map("event_date")
@@ -21,19 +22,17 @@ model Race {
   // Location
   country String
   region  String?
-  city    String
   venue   String?
-  address String?
 
   // Registration Info
-  registrationStatus String    @map("registration_status") // "접수 중", "얼리버드", "대기 접수", "마감"
+  registrationStatus String    @map("registration_status") // "접수 중", "접수 예정", "마감"
   registrationStart  DateTime? @map("registration_start")
   registrationEnd    DateTime? @map("registration_end")
 
   // Event Info
-  categories   String[] // ["5K 펀런", "10K 레이스", "하프 마라톤", "풀 마라톤"]
+  categories   String[] // ["10km", "5km", "하프마라톤", "풀마라톤"]
   organizer    String?
-  organizerRep String?  @map("organizer_rep")
+  organizerRep String?  @map("organizer_rep") // 대표자
 
   // Contact
   phone   String?
@@ -41,8 +40,7 @@ model Race {
   website String?
 
   // Images
-  imageUrl    String? @map("image_url")
-  mapImageUrl String? @map("map_image_url")
+  imageUrl String? @map("image_url")
 
   // Features
   isFeatured Boolean @default(false) @map("is_featured")
@@ -56,5 +54,6 @@ model Race {
   @@index([registrationStatus])
   @@index([isFeatured])
   @@index([country])
+  @@index([region])
   @@map("races")
 }
