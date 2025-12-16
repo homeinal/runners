@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Dark mode variant - selector-based for manual toggle */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* Colors - Neobrutalism palette */
   --color-primary: #f9f506;

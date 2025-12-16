@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   return (
@@ -18,16 +21,18 @@ export function Header() {
           </h1>
         </Link>
 
-        <div className="hidden md:flex items-center">
-          <div className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-full px-4 py-1.5 font-bold text-sm shadow-[var(--shadow-neobrutalism-sm)] flex items-center gap-2">
-            <span className="size-2 rounded-full bg-green-500 animate-pulse" />
-            국내 행사
+        <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center">
+            <div className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-full px-4 py-1.5 font-bold text-sm shadow-[var(--shadow-neobrutalism-sm)] flex items-center gap-2">
+              <span className="size-2 rounded-full bg-green-500 animate-pulse" />
+              국내 행사
+            </div>
           </div>
+          <ThemeToggle />
+          <button className="md:hidden p-2" aria-label="메뉴 열기">
+            <span className="material-symbols-outlined">menu</span>
+          </button>
         </div>
-
-        <button className="md:hidden p-2" aria-label="메뉴 열기">
-          <span className="material-symbols-outlined">menu</span>
-        </button>
       </div>
     </header>
   );

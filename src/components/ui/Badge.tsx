@@ -35,7 +35,7 @@ export function Badge({
     return (
       <span
         className={cn(
-          "bg-black text-white px-3 py-1 text-xs font-bold uppercase tracking-wider border-2 border-black",
+          "bg-black dark:bg-white text-white dark:text-black px-3 py-1 text-xs font-bold uppercase tracking-wider border-2 border-black dark:border-white",
           className
         )}
       >

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/layout/ThemeProvider";
 
 const notoSansKR = Noto_Sans_KR({
   subsets: ["latin"],
@@ -38,8 +39,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className="light">
+    <html lang="ko" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const theme = localStorage.getItem('theme') ||
+                  (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.classList.add(theme);
+              })();
+            `,
+          }}
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
@@ -52,10 +64,12 @@ export default function RootLayout({
       <body
         className={`${notoSansKR.variable} font-display bg-background-light dark:bg-background-dark text-border-dark dark:text-background-light min-h-screen flex flex-col relative overflow-x-hidden antialiased`}
       >
-        <div className="absolute inset-0 bg-grid-pattern pointer-events-none z-0" />
-        <div className="relative z-10 flex flex-col min-h-screen w-full">
-          {children}
-        </div>
+        <ThemeProvider>
+          <div className="absolute inset-0 bg-grid-pattern pointer-events-none z-0" />
+          <div className="relative z-10 flex flex-col min-h-screen w-full">
+            {children}
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

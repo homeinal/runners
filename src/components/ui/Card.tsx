@@ -16,9 +16,9 @@ export function Card({
     default:
       "bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-xl shadow-[var(--shadow-neobrutalism)] p-4 hover:shadow-[var(--shadow-neobrutalism-hover)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all",
     featured:
-      "border-4 border-border-dark bg-primary rounded-xl overflow-hidden shadow-[var(--shadow-neobrutalism)] transition-transform duration-300 hover:-translate-y-1",
+      "border-4 border-border-dark dark:border-white bg-primary rounded-xl overflow-hidden shadow-[var(--shadow-neobrutalism)] transition-transform duration-300 hover:-translate-y-1",
     section:
-      "bg-white border-2 border-border-dark shadow-[var(--shadow-neobrutalism)] p-6 md:p-8 hover:bg-yellow-50 transition-colors",
+      "bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white shadow-[var(--shadow-neobrutalism)] p-6 md:p-8 hover:bg-yellow-50 dark:hover:bg-background-dark/80 transition-colors",
   };
 
   return (

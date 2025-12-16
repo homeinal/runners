@@ -16,7 +16,7 @@ export function LoadMoreButton({ hasMore, currentPage }: LoadMoreButtonProps) {
   if (!hasMore) {
     return (
       <div className="flex justify-center mt-8">
-        <p className="text-sm font-bold text-border-dark/50 uppercase">
+        <p className="text-sm font-bold text-border-dark/50 dark:text-white/50 uppercase">
           모든 대회를 확인했습니다
         </p>
       </div>
