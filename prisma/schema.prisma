@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Race {
+  id          String   @id @default(cuid())
+  title       String
+  titleEn     String?  @map("title_en")
+  description String?  @db.Text
+
+  // Date & Time
+  eventDate DateTime @map("event_date")
+  eventTime String?  @map("event_time")
+
+  // Location
+  country String
+  region  String?
+  city    String
+  venue   String?
+  address String?
+
+  // Registration Info
+  registrationStatus String    @map("registration_status") // "접수 중", "얼리버드", "대기 접수", "마감"
+  registrationStart  DateTime? @map("registration_start")
+  registrationEnd    DateTime? @map("registration_end")
+
+  // Event Info
+  categories   String[] // ["5K 펀런", "10K 레이스", "하프 마라톤", "풀 마라톤"]
+  organizer    String?
+  organizerRep String?  @map("organizer_rep")
+
+  // Contact
+  phone   String?
+  email   String?
+  website String?
+
+  // Images
+  imageUrl    String? @map("image_url")
+  mapImageUrl String? @map("map_image_url")
+
+  // Features
+  isFeatured Boolean @default(false) @map("is_featured")
+  isUrgent   Boolean @default(false) @map("is_urgent") // 24시간 내 마감
+
+  // Metadata
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([eventDate])
+  @@index([registrationStatus])
+  @@index([isFeatured])
+  @@index([country])
+  @@map("races")
+}

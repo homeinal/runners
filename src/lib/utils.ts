@@ -1,0 +1,98 @@
+/**
+ * Format date to Korean locale string
+ */
+export function formatDate(date: Date | string): string {
+  const d = new Date(date);
+  return d.toLocaleDateString("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+/**
+ * Format date to day/month format
+ */
+export function formatDayMonth(date: Date | string): { day: string; month: string } {
+  const d = new Date(date);
+  return {
+    day: d.getDate().toString(),
+    month: `${d.getMonth() + 1}월`,
+  };
+}
+
+/**
+ * Get registration status badge color
+ */
+export function getStatusColor(status: string): {
+  bg: string;
+  text: string;
+  border: string;
+} {
+  switch (status) {
+    case "접수 중":
+      return {
+        bg: "bg-green-100",
+        text: "text-green-800",
+        border: "border-green-800",
+      };
+    case "얼리버드":
+      return {
+        bg: "bg-yellow-100",
+        text: "text-yellow-800",
+        border: "border-yellow-800",
+      };
+    case "대기 접수":
+      return {
+        bg: "bg-gray-200",
+        text: "text-gray-800",
+        border: "border-gray-800",
+      };
+    case "마감":
+      return {
+        bg: "bg-red-100",
+        text: "text-red-800",
+        border: "border-red-800",
+      };
+    default:
+      return {
+        bg: "bg-gray-100",
+        text: "text-gray-600",
+        border: "border-gray-600",
+      };
+  }
+}
+
+/**
+ * Check if registration is closing within 24 hours
+ */
+export function isUrgent(registrationEnd: Date | string | null): boolean {
+  if (!registrationEnd) return false;
+  const end = new Date(registrationEnd);
+  const now = new Date();
+  const diff = end.getTime() - now.getTime();
+  const hours = diff / (1000 * 60 * 60);
+  return hours > 0 && hours <= 24;
+}
+
+/**
+ * Format registration period
+ */
+export function formatRegistrationPeriod(
+  start: Date | string | null,
+  end: Date | string | null
+): string {
+  if (!start || !end) return "기간 미정";
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  const formatShort = (d: Date) =>
+    `${d.getMonth() + 1}월 ${d.getDate()}일`;
+  return `${formatShort(startDate)} - ${formatShort(endDate)}`;
+}
+
+/**
+ * Merge class names
+ */
+export function cn(...classes: (string | undefined | null | false)[]): string {
+  return classes.filter(Boolean).join(" ");
+}

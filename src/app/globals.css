@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors - Neobrutalism palette */
+  --color-primary: #f9f506;
+  --color-background-light: #f8f8f5;
+  --color-background-dark: #23220f;
+  --color-border-dark: #1c1c0d;
+  --color-foreground: #1c1c0d;
+
+  /* Font Families */
+  --font-display: "Noto Sans KR", "Spline Sans", sans-serif;
+
+  /* Border Radius */
+  --radius-DEFAULT: 1rem;
+  --radius-lg: 2rem;
+  --radius-xl: 3rem;
+
+  /* Shadows - Neobrutalism style */
+  --shadow-neobrutalism: 4px 4px 0px 0px var(--color-border-dark);
+  --shadow-neobrutalism-sm: 2px 2px 0px 0px var(--color-border-dark);
+  --shadow-neobrutalism-hover: 2px 2px 0px 0px var(--color-border-dark);
+  --shadow-neobrutalism-active: 0px 0px 0px 0px var(--color-border-dark);
+}
+
+/* Grid pattern background */
+.bg-grid-pattern {
+  background-image: radial-gradient(#1c1c0d 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.1;
+}
+
+/* Dark mode grid pattern */
+.dark .bg-grid-pattern {
+  background-image: radial-gradient(#f8f8f5 1px, transparent 1px);
+}
+
+/* Base styles */
+body {
+  font-family: var(--font-display);
+  background-color: var(--color-background-light);
+  color: var(--color-foreground);
+}
+
+.dark body {
+  background-color: var(--color-background-dark);
+  color: var(--color-background-light);
+}
+
+/* Selection styling */
+::selection {
+  background-color: var(--color-primary);
+  color: var(--color-border-dark);
+}
+
+/* Material Symbols font settings */
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
