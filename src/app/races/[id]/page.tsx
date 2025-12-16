@@ -19,12 +19,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `${race.title} - 러너스하이`,
-    description:
-      race.description ||
-      `${race.city}에서 열리는 ${race.title} 대회 정보`,
+    description: `${race.region || race.country}에서 열리는 ${race.title} 대회 정보`,
     openGraph: {
       title: race.title,
-      description: race.description || `${race.city}에서 열리는 대회`,
+      description: `${race.region || race.country}에서 열리는 ${race.title} 대회`,
       images: race.imageUrl ? [race.imageUrl] : [],
     },
   };
@@ -46,10 +44,10 @@ export default async function RaceDetailPage({ params }: PageProps) {
     startDate: race.eventDate.toISOString(),
     location: {
       "@type": "Place",
-      name: race.venue || race.city,
+      name: race.venue || race.region,
       address: {
         "@type": "PostalAddress",
-        addressLocality: race.city,
+        addressRegion: race.region,
         addressCountry: race.country,
       },
     },
@@ -83,7 +81,7 @@ export default async function RaceDetailPage({ params }: PageProps) {
           </Link>
           <div className="flex gap-2 text-sm font-bold uppercase opacity-60">
             <span>홈</span> / <span>{race.country}</span> /{" "}
-            <span>{race.city}</span>
+            <span>{race.region}</span>
           </div>
         </div>
 

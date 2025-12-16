@@ -2,7 +2,7 @@ import type { Race } from "@prisma/client";
 
 export type { Race };
 
-export type RegistrationStatus = "접수 중" | "얼리버드" | "대기 접수" | "마감";
+export type RegistrationStatus = "접수 중" | "접수 예정" | "마감" | "정보 없음";
 
 export type SortOption = "deadline" | "date" | "popular";
 

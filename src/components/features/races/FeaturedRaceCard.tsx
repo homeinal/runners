@@ -39,7 +39,7 @@ export function FeaturedRaceCard({ race }: FeaturedRaceCardProps) {
 
               {/* Date & Location */}
               <p className="text-lg font-bold text-border-dark/80">
-                {month} {day}일 • {race.country} {race.city}
+                {month} {day}일 • {race.country} {race.region}
               </p>
             </div>
 

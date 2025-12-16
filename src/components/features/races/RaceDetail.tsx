@@ -54,10 +54,10 @@ export function RaceDetail({ race }: RaceDetailProps) {
             </span>
             <div className="flex flex-col leading-none">
               <span className="font-bold text-lg">
-                {race.country}, {race.city}
+                {race.country}, {race.region || "지역 미정"}
               </span>
               <span className="text-sm font-medium uppercase text-gray-600">
-                {race.region || "지역 미정"}
+                {race.venue || "장소 미정"}
               </span>
             </div>
           </div>
@@ -153,15 +153,6 @@ export function RaceDetail({ race }: RaceDetailProps) {
           </span>
         </div>
         <div className="md:w-2/3 flex flex-col gap-4">
-          {race.mapImageUrl && (
-            <div className="w-full h-48 bg-gray-200 border-2 border-border-dark overflow-hidden relative">
-              <img
-                src={race.mapImageUrl}
-                alt={`${race.venue || race.city} 지도`}
-                className="w-full h-full object-cover grayscale contrast-125 hover:grayscale-0 transition-all duration-500"
-              />
-            </div>
-          )}
           <div className="flex flex-col gap-4 md:flex-row md:justify-between">
             <div className="flex flex-col gap-1">
               <span className="text-xs font-bold uppercase text-gray-500">
@@ -173,10 +164,10 @@ export function RaceDetail({ race }: RaceDetailProps) {
             </div>
             <div className="flex flex-col gap-1">
               <span className="text-xs font-bold uppercase text-gray-500">
-                주소
+                지역
               </span>
               <p className="text-base font-medium leading-tight">
-                {race.address || "주소 미정"}
+                {race.region || "지역 미정"}
               </p>
             </div>
           </div>
