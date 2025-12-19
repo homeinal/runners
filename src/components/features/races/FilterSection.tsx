@@ -75,7 +75,7 @@ export function FilterSection({ regions }: FilterSectionProps) {
             onClick={() => updateParams({ sort: option.value })}
             className={`text-sm font-bold px-4 py-2 rounded-full transition-all border-2 ${
               currentSort === option.value
-                ? "bg-primary border-primary text-black" // text-white -> text-black for visibility on yellow
+                ? "bg-primary border-border-dark text-border-dark"
                 : "bg-transparent border-border-dark dark:border-white hover:bg-black/5 dark:hover:bg-white/10"
             }`}
           >
