@@ -1,14 +1,15 @@
 import Link from "next/link";
-import type { Race } from "@/types";
-import { formatDayMonth } from "@/lib/utils";
+import type { RaceWithCategories } from "@/types";
+import { formatDayMonth, getRaceRegistrationStatus } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 
 interface RaceCardProps {
-  race: Race;
+  race: RaceWithCategories;
 }
 
 export function RaceCard({ race }: RaceCardProps) {
   const { day, month } = formatDayMonth(race.eventDate);
+  const registrationStatus = getRaceRegistrationStatus(race);
 
   return (
     <Link
@@ -58,8 +59,8 @@ export function RaceCard({ race }: RaceCardProps) {
             <span className="text-sm font-medium">
               {race.country} {race.region}
             </span>
-            <Badge variant="status" status={race.registrationStatus}>
-              {race.registrationStatus}
+            <Badge variant="status" status={registrationStatus}>
+              {registrationStatus}
             </Badge>
           </div>
         </div>

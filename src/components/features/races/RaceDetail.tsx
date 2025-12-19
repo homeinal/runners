@@ -1,14 +1,23 @@
-import type { Race } from "@/types";
-import { formatDate, formatRegistrationPeriod } from "@/lib/utils";
+import type { RaceWithCategories } from "@/types";
+import {
+  formatDate,
+  formatRegistrationPeriod,
+  getRaceRegistrationStatus,
+  getRaceCategoryNames,
+  getRaceRegistrationPeriod,
+} from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 
 interface RaceDetailProps {
-  race: Race;
+  race: RaceWithCategories;
 }
 
 export function RaceDetail({ race }: RaceDetailProps) {
   const eventDate = new Date(race.eventDate);
+  const registrationStatus = getRaceRegistrationStatus(race);
+  const categoryNames = getRaceCategoryNames(race);
+  const { start: regStart, end: regEnd } = getRaceRegistrationPeriod(race);
 
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -76,17 +85,14 @@ export function RaceDetail({ race }: RaceDetailProps) {
                 접수 상태
               </span>
               <span className="bg-black text-white px-2 py-0.5 text-sm font-bold uppercase w-fit">
-                {race.registrationStatus}
+                {registrationStatus}
               </span>
             </div>
           </div>
           <div className="flex flex-col">
             <span className="text-xs font-bold uppercase">기간</span>
             <div className="text-2xl font-black">
-              {formatRegistrationPeriod(
-                race.registrationStart,
-                race.registrationEnd
-              )}
+              {formatRegistrationPeriod(regStart, regEnd)}
             </div>
             <p className="text-sm font-medium leading-tight mt-1 max-w-sm">
               마감 전에 등록하세요. 추가 접수는 불가능합니다.
@@ -120,18 +126,18 @@ export function RaceDetail({ race }: RaceDetailProps) {
       </section>
 
       {/* Categories Section */}
-      {race.categories && race.categories.length > 0 && (
+      {categoryNames.length > 0 && (
         <Card variant="section">
           <h3 className="text-xl font-black uppercase mb-4 flex items-center gap-2">
             <span className="material-symbols-outlined">category</span>
             종목
           </h3>
           <div className="flex flex-wrap gap-3">
-            {race.categories.map((category) => (
-              <div key={category} className="group relative cursor-pointer">
+            {categoryNames.map((categoryName) => (
+              <div key={categoryName} className="group relative cursor-pointer">
                 <div className="absolute inset-0 bg-black rounded-full translate-x-1 translate-y-1" />
                 <div className="relative bg-white border-2 border-black rounded-full px-6 py-2 font-bold uppercase text-sm hover:-translate-y-1 hover:-translate-x-1 transition-transform group-hover:bg-primary">
-                  {category}
+                  {categoryName}
                 </div>
               </div>
             ))}

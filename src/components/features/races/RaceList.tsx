@@ -1,8 +1,8 @@
-import type { Race } from "@/types";
+import type { RaceWithCategories } from "@/types";
 import { RaceCard } from "./RaceCard";
 
 interface RaceListProps {
-  races: Race[];
+  races: RaceWithCategories[];
 }
 
 export function RaceList({ races }: RaceListProps) {

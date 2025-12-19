@@ -1,9 +1,9 @@
 import Link from "next/link";
-import type { Race } from "@/types";
+import type { RaceWithCategories } from "@/types";
 import { formatDate } from "@/lib/utils";
 
 interface FeaturedRaceCardProps {
-  race: Race;
+  race: RaceWithCategories;
 }
 
 export function FeaturedRaceCard({ race }: FeaturedRaceCardProps) {

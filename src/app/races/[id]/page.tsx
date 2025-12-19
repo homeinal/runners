@@ -11,7 +11,14 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const race = await prisma.race.findUnique({ where: { id } });
+  const race = await prisma.race.findUnique({
+    where: { id },
+    include: {
+      categories: {
+        include: { schedules: true },
+      },
+    },
+  });
 
   if (!race) {
     return { title: "대회를 찾을 수 없습니다 - 러너스하이" };
@@ -30,7 +37,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function RaceDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const race = await prisma.race.findUnique({ where: { id } });
+  const race = await prisma.race.findUnique({
+    where: { id },
+    include: {
+      categories: {
+        include: { schedules: true },
+      },
+    },
+  });
 
   if (!race) {
     notFound();

@@ -55,6 +55,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       eventDate: { gte: new Date() },
     },
     orderBy: { eventDate: "asc" },
+    include: {
+      categories: {
+        include: { schedules: true },
+      },
+    },
   });
 
   // Fetch races with pagination
@@ -64,6 +69,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       orderBy,
       take: RACES_PER_PAGE * page,
       skip: 0,
+      include: {
+        categories: {
+          include: { schedules: true },
+        },
+      },
     }),
     prisma.race.count({ where }),
   ]);
