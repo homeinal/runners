@@ -8,15 +8,20 @@ import {
   startOfDay,
   startOfWeek,
   endOfWeek,
+  startOfMonth,
+  endOfMonth,
   addDays,
   addWeeks,
+  addMonths,
   isSameDay,
   isSameWeek,
+  isSameMonth,
   isBefore,
   isAfter,
   differenceInHours,
   differenceInMinutes,
   differenceInSeconds,
+  differenceInDays,
   parseISO,
 } from "date-fns";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
@@ -119,6 +124,70 @@ export function getWeekDatesKST(weekStart: Date): Date[] {
     dates.push(addDays(weekStart, i));
   }
   return dates;
+}
+
+// ============================================
+// 월간 관련 함수들 (KST 기준)
+// ============================================
+
+/**
+ * KST 기준 월의 시작 (1일 00:00:00)
+ */
+export function startOfMonthKST(date: Date | string): Date {
+  const kst = toKST(date);
+  return startOfMonth(kst);
+}
+
+/**
+ * KST 기준 월의 끝 (마지막일 23:59:59.999)
+ */
+export function endOfMonthKST(date: Date | string): Date {
+  const kst = toKST(date);
+  return endOfMonth(kst);
+}
+
+/**
+ * KST 기준 월간 범위 가져오기
+ */
+export function getMonthRangeKST(date: Date | string): {
+  monthStart: Date;
+  monthEnd: Date;
+} {
+  return {
+    monthStart: startOfMonthKST(date),
+    monthEnd: endOfMonthKST(date),
+  };
+}
+
+/**
+ * KST 기준 해당 월의 모든 날짜 배열
+ */
+export function getMonthDatesKST(monthStart: Date): Date[] {
+  const dates: Date[] = [];
+  const monthEnd = endOfMonth(monthStart);
+  const totalDays = differenceInDays(monthEnd, monthStart) + 1;
+
+  for (let i = 0; i < totalDays; i++) {
+    dates.push(addDays(monthStart, i));
+  }
+  return dates;
+}
+
+/**
+ * 월 단위로 날짜 이동
+ */
+export function addMonthsKST(date: Date | string, months: number): Date {
+  return addMonths(toKST(date), months);
+}
+
+/**
+ * KST 기준 같은 월인지 확인
+ */
+export function isSameMonthKST(
+  date1: Date | string,
+  date2: Date | string
+): boolean {
+  return isSameMonth(toKST(date1), toKST(date2));
 }
 
 // ============================================

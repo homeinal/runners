@@ -2,6 +2,8 @@ import type { RaceWithCategories } from "@/types";
 import { ScheduleCard } from "./ScheduleCard";
 import { formatDateWithDayEn, getDateParts } from "@/lib/date";
 
+type ViewMode = "week" | "month";
+
 interface DayGroup {
   date: string | null; // ISO string (Server에서 직렬화됨)
   races: Array<{
@@ -17,9 +19,27 @@ interface DayGroup {
 
 interface ScheduleTimelineProps {
   dayGroups: DayGroup[];
+  viewMode?: ViewMode;
 }
 
-export function ScheduleTimeline({ dayGroups }: ScheduleTimelineProps) {
+export function ScheduleTimeline({ dayGroups, viewMode = "week" }: ScheduleTimelineProps) {
+  // 월간 뷰에서 대회가 하나도 없는 경우
+  if (viewMode === "month" && dayGroups.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <span className="material-symbols-outlined text-gray-300 dark:text-gray-600 text-6xl mb-4">
+          event_busy
+        </span>
+        <p className="text-xl font-bold text-gray-400 dark:text-gray-500">
+          이번 달에는 접수 일정이 없습니다.
+        </p>
+        <p className="text-sm text-gray-400 dark:text-gray-600 mt-2">
+          다른 달을 선택해 보세요.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="relative">
       {/* Vertical timeline line */}

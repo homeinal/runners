@@ -11,6 +11,8 @@ import {
   startOfDayKST,
   getWeekRangeKST,
   getWeekDatesKST,
+  getMonthRangeKST,
+  getMonthDatesKST,
   isSameDayKST,
   isPastKST,
   isTodayKST,
@@ -22,9 +24,13 @@ import {
 } from "@/lib/date";
 import { parseISO, isBefore, isAfter } from "date-fns";
 
+type ViewMode = "week" | "month";
+
 interface WeeklyPageProps {
   searchParams: Promise<{
     week?: string;
+    month?: string;
+    view?: ViewMode;
   }>;
 }
 
@@ -34,24 +40,45 @@ export default async function WeeklyPage({ searchParams }: WeeklyPageProps) {
   // KST 기준 오늘 날짜
   const today = todayKST();
 
-  // week 파라미터 파싱 또는 현재 주 사용
-  let baseDate = today;
+  // View mode 결정
+  const viewMode: ViewMode = params.view === "month" ? "month" : "week";
+
+  // 주간 범위 계산 (항상 필요 - 네비게이터용)
+  let weekBaseDate = today;
   if (params.week) {
     const parsed = parseISO(params.week);
     if (!isNaN(parsed.getTime())) {
-      baseDate = startOfDayKST(parsed);
+      weekBaseDate = startOfDayKST(parsed);
     }
   }
+  const { weekStart, weekEnd } = getWeekRangeKST(weekBaseDate);
 
-  const { weekStart, weekEnd } = getWeekRangeKST(baseDate);
-  const weekDates = getWeekDatesKST(weekStart);
+  // 월간 범위 계산
+  let monthBaseDate = today;
+  if (params.month) {
+    const parsed = parseISO(params.month);
+    if (!isNaN(parsed.getTime())) {
+      monthBaseDate = startOfDayKST(parsed);
+    }
+  } else if (params.week) {
+    // month 파라미터가 없으면 week 기준 월 사용
+    monthBaseDate = weekBaseDate;
+  }
+  const { monthStart, monthEnd } = getMonthRangeKST(monthBaseDate);
 
-  // 접수시작일이 이번 주에 있는 대회 조회
+  // 실제 사용할 날짜 범위 결정
+  const dateRangeStart = viewMode === "month" ? monthStart : weekStart;
+  const dateRangeEnd = viewMode === "month" ? monthEnd : weekEnd;
+  const targetDates = viewMode === "month"
+    ? getMonthDatesKST(monthStart)
+    : getWeekDatesKST(weekStart);
+
+  // 접수시작일이 해당 기간에 있는 대회 조회
   const races = await prisma.race.findMany({
     where: {
       registrationStart: {
-        gte: weekStart,
-        lte: weekEnd,
+        gte: dateRangeStart,
+        lte: dateRangeEnd,
       },
     },
     orderBy: [{ registrationStart: "asc" }, { eventDate: "asc" }],
@@ -116,7 +143,7 @@ export default async function WeeklyPage({ searchParams }: WeeklyPageProps) {
   }
 
   // 날짜별로 그룹화: 접수시작일이 그 날인 대회만
-  const dayGroups = weekDates.map((date) => {
+  const allDayGroups = targetDates.map((date) => {
     const racesForDay: Array<{
       race: RaceWithCategories;
       status: "closed" | "open" | "upcoming";
@@ -155,6 +182,11 @@ export default async function WeeklyPage({ searchParams }: WeeklyPageProps) {
     };
   });
 
+  // 월간 뷰에서는 대회가 있는 날만 필터링
+  const dayGroups = viewMode === "month"
+    ? allDayGroups.filter((group) => group.races.length > 0)
+    : allDayGroups;
+
   return (
     <>
       <Header />
@@ -164,10 +196,13 @@ export default async function WeeklyPage({ searchParams }: WeeklyPageProps) {
             currentDate={serializeDate(today)!}
             weekStart={serializeDate(weekStart)!}
             weekEnd={serializeDate(weekEnd)!}
+            monthStart={serializeDate(monthStart)!}
+            monthEnd={serializeDate(monthEnd)!}
+            viewMode={viewMode}
           />
         </Suspense>
 
-        <ScheduleTimeline dayGroups={dayGroups} />
+        <ScheduleTimeline dayGroups={dayGroups} viewMode={viewMode} />
       </main>
       <Footer />
     </>
