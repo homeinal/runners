@@ -21,14 +21,15 @@ export type RaceWithCategories = Race & {
 // 레거시 타입 (호환성 유지용)
 export type RegistrationStatus = "접수 중" | "접수 예정" | "마감" | "정보 없음";
 
-export type SortOption = "deadline" | "date" | "popular";
+export type SortOption = "registration" | "date" | "popular";
 
-export type RegionFilter = "전체" | "한국" | "일본" | "미국" | "유럽" | "기타";
+export type RegionFilter = string;
 
 export interface RaceListParams {
   sort?: SortOption;
   region?: RegionFilter;
-  status?: RegistrationStatus | "전체";
+  status?: string;
+  q?: string;
   page?: number;
   limit?: number;
 }

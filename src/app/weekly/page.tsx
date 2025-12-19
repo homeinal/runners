@@ -1,7 +1,10 @@
 import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
-import { Header } from "@/components/layout";
-import { WheelList } from "@/components/features/urgent/WheelList";
+import { Header, Footer } from "@/components/layout";
+import {
+  WeekNavigator,
+  ScheduleTimeline,
+} from "@/components/features/schedule";
 import type { RaceWithCategories } from "@/types";
 
 interface UrgentPageProps {
@@ -46,7 +49,7 @@ function isSameDay(d1: Date, d2: Date): boolean {
   );
 }
 
-export default async function UrgentPage({ searchParams }: UrgentPageProps) {
+export default async function WeeklyPage({ searchParams }: UrgentPageProps) {
   const params = await searchParams;
   const now = new Date();
 
@@ -179,11 +182,18 @@ export default async function UrgentPage({ searchParams }: UrgentPageProps) {
   return (
     <>
       <Header />
-      <main className="flex-1 w-full bg-background-light dark:bg-background-dark">
-        <Suspense fallback={<div className="h-screen flex items-center justify-center">Loading...</div>}>
-          <WheelList dayGroups={dayGroups} />
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-8">
+        <Suspense fallback={<div className="h-24" />}>
+          <WeekNavigator
+            currentDate={now}
+            weekStart={weekStart}
+            weekEnd={weekEnd}
+          />
         </Suspense>
+
+        <ScheduleTimeline dayGroups={dayGroups} />
       </main>
+      <Footer />
     </>
   );
 }

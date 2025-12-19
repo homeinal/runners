@@ -103,11 +103,11 @@ export function ScheduleCard({
           ) : status === "open" && time ? (
             <>
               <span
-                className={`material-symbols-outlined text-2xl text-primary mb-1 animate-pulse`}
+                className={`material-symbols-outlined text-2xl ${config.iconColor} mb-1 animate-pulse`}
               >
                 check_circle
               </span>
-              <span className="text-xl font-black block leading-none">
+              <span className="text-xl font-black block leading-none text-border-dark">
                 {time}
               </span>
               <span className="text-[9px] font-bold mt-0.5 text-green-700 bg-green-100 px-1.5 py-0.5 rounded">

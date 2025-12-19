@@ -7,6 +7,7 @@ import { ThemeToggle } from "./ThemeToggle";
 export function Header() {
   const pathname = usePathname();
   const isUrgentPage = pathname === "/urgent";
+  const isWeeklyPage = pathname === "/weekly";
   const isHomePage = pathname === "/";
 
   return (
@@ -33,12 +34,23 @@ export function Header() {
         </div>
 
         {/* Navigation Tabs */}
-        <nav className="flex items-center gap-3 bg-white dark:bg-background-dark p-1.5 rounded-full border-2 border-border-dark dark:border-white shadow-[var(--shadow-neobrutalism-sm)]">
+        <nav className="flex items-center gap-3 bg-white dark:bg-background-dark p-1.5 rounded-full border-2 border-border-dark dark:border-white shadow-[var(--shadow-neobrutalism-sm)] overflow-x-auto max-w-full">
+          <Link
+            href="/weekly"
+            className={`px-4 md:px-6 py-2 rounded-full font-bold text-sm uppercase flex items-center gap-2 transition-colors whitespace-nowrap ${
+              isWeeklyPage
+                ? "bg-primary border-2 border-border-dark shadow-sm text-border-dark"
+                : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
+            }`}
+          >
+            <span className="material-symbols-outlined text-lg">calendar_view_week</span>
+            주간접수
+          </Link>
           <Link
             href="/urgent"
-            className={`px-6 py-2 rounded-full font-black text-sm uppercase flex items-center gap-2 transition-colors ${
+            className={`px-4 md:px-6 py-2 rounded-full font-black text-sm uppercase flex items-center gap-2 transition-colors whitespace-nowrap ${
               isUrgentPage
-                ? "bg-primary border-2 border-border-dark shadow-sm"
+                ? "bg-primary border-2 border-border-dark shadow-sm text-border-dark"
                 : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
             }`}
           >
@@ -47,13 +59,13 @@ export function Header() {
           </Link>
           <Link
             href="/"
-            className={`px-6 py-2 rounded-full font-bold text-sm uppercase transition-colors ${
+            className={`px-4 md:px-6 py-2 rounded-full font-bold text-sm uppercase transition-colors whitespace-nowrap ${
               isHomePage
-                ? "bg-primary border-2 border-border-dark shadow-sm"
+                ? "bg-primary border-2 border-border-dark shadow-sm text-border-dark"
                 : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
             }`}
           >
-            전체 대회 보기
+            전체 대회
           </Link>
         </nav>
 
