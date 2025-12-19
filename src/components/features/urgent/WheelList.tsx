@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import type { RaceWithCategories } from "@/types";
 import { ScheduleCard } from "@/components/features/schedule/ScheduleCard";
+import { getDateParts } from "@/lib/date";
 
 interface DayGroup {
-  date: Date;
+  date: string | null; // ISO string (Server에서 직렬화됨)
   races: Array<{
     race: RaceWithCategories;
     status: "closed" | "open" | "upcoming";
@@ -19,18 +20,6 @@ interface DayGroup {
 
 interface WheelListProps {
   dayGroups: DayGroup[];
-}
-
-function formatDateLabelKorean(date: Date): {
-  month: string;
-  day: string;
-  weekday: string;
-} {
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; // 디자인 시안에 맞게 영문 요일로 변경
-  const weekday = weekdays[date.getDay()];
-  return { month, day, weekday };
 }
 
 // Helper to group races by time
@@ -138,12 +127,14 @@ export function WheelList({ dayGroups }: WheelListProps) {
         style={{ scrollBehavior: "smooth" }}
       >
         {dayGroups.map((group, index) => {
-          const dateInfo = formatDateLabelKorean(group.date);
+          if (!group.date) return null;
+
+          const dateInfo = getDateParts(group.date);
           const isActive = index === activeIndex;
 
           return (
             <div
-              key={group.date.toISOString()}
+              key={group.date}
               ref={(el) => { itemRefs.current[index] = el }}
               data-index={index}
               className={`snap-center w-full min-h-[300px] flex flex-col items-center justify-center transition-all duration-500 ease-out p-4 md:p-8 ${
@@ -155,15 +146,15 @@ export function WheelList({ dayGroups }: WheelListProps) {
                 <div className="flex items-center justify-between mb-6 border-b-2 border-border-dark dark:border-white/20 pb-4">
                     <div className="flex items-center gap-4">
                         <div className={`flex flex-col items-center justify-center size-16 rounded-xl border-2 border-border-dark dark:border-white font-black leading-none ${group.isToday ? 'bg-primary text-border-dark' : 'bg-gray-100 dark:bg-gray-800 text-gray-500'}`}>
-                            <span className="text-xs uppercase">{dateInfo.month}</span>
-                            <span className="text-2xl">{dateInfo.day}</span>
+                            <span className="text-xs uppercase">{String(dateInfo.month).padStart(2, "0")}</span>
+                            <span className="text-2xl">{String(dateInfo.day).padStart(2, "0")}</span>
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
-                                <span className="text-2xl font-black uppercase text-border-dark dark:text-white">{dateInfo.weekday}</span>
+                                <span className="text-2xl font-black uppercase text-border-dark dark:text-white">{dateInfo.weekdayEn}</span>
                                 {group.isToday && <span className="px-2 py-0.5 bg-[#FF6B6B] text-white text-[10px] font-black uppercase rounded-full animate-pulse shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)]">Today</span>}
                             </div>
-                            <span className="text-sm font-bold text-gray-400">{group.date.getFullYear()}</span>
+                            <span className="text-sm font-bold text-gray-400">{dateInfo.year}</span>
                         </div>
                     </div>
                     <div className="text-right">

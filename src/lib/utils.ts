@@ -1,23 +1,20 @@
+import { toKST, formatDateKorean, nowKST, hoursUntil } from "./date";
+
 /**
  * Format date to Korean locale string
  */
 export function formatDate(date: Date | string): string {
-  const d = new Date(date);
-  return d.toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return formatDateKorean(date);
 }
 
 /**
  * Format date to day/month format
  */
 export function formatDayMonth(date: Date | string): { day: string; month: string } {
-  const d = new Date(date);
+  const kst = toKST(date);
   return {
-    day: d.getDate().toString(),
-    month: `${d.getMonth() + 1}월`,
+    day: kst.getDate().toString(),
+    month: `${kst.getMonth() + 1}월`,
   };
 }
 
@@ -68,10 +65,7 @@ export function getStatusColor(status: string): {
  */
 export function isUrgent(registrationEnd: Date | string | null): boolean {
   if (!registrationEnd) return false;
-  const end = new Date(registrationEnd);
-  const now = new Date();
-  const diff = end.getTime() - now.getTime();
-  const hours = diff / (1000 * 60 * 60);
+  const hours = hoursUntil(registrationEnd);
   return hours > 0 && hours <= 24;
 }
 
@@ -83,11 +77,11 @@ export function formatRegistrationPeriod(
   end: Date | string | null
 ): string {
   if (!start || !end) return "기간 미정";
-  const startDate = new Date(start);
-  const endDate = new Date(end);
+  const startKst = toKST(start);
+  const endKst = toKST(end);
   const formatShort = (d: Date) =>
     `${d.getMonth() + 1}월 ${d.getDate()}일`;
-  return `${formatShort(startDate)} - ${formatShort(endDate)}`;
+  return `${formatShort(startKst)} - ${formatShort(endKst)}`;
 }
 
 /**

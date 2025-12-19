@@ -1,9 +1,9 @@
 import type { RaceWithCategories } from "@/types";
 import { ScheduleCard } from "./ScheduleCard";
-import { getRaceRegistrationPeriod } from "@/lib/utils";
+import { formatDateWithDayEn, getDateParts } from "@/lib/date";
 
 interface DayGroup {
-  date: Date;
+  date: string | null; // ISO string (Server에서 직렬화됨)
   races: Array<{
     race: RaceWithCategories;
     status: "closed" | "open" | "upcoming";
@@ -19,27 +19,6 @@ interface ScheduleTimelineProps {
   dayGroups: DayGroup[];
 }
 
-function formatDateLabel(date: Date): string {
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const weekday = weekdays[date.getDay()];
-  return `${month}.${day} (${weekday})`;
-}
-
-function formatDateLabelKorean(date: Date): {
-  month: string;
-  day: string;
-  weekday: string;
-  formatted: string;
-} {
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; // 영문 요일로 변경 (디자인 시안 맞춤)
-  const weekday = weekdays[date.getDay()];
-  return { month, day, weekday, formatted: `${month}.${day}\n(${weekday})` };
-}
-
 export function ScheduleTimeline({ dayGroups }: ScheduleTimelineProps) {
   return (
     <div className="relative">
@@ -47,12 +26,15 @@ export function ScheduleTimeline({ dayGroups }: ScheduleTimelineProps) {
       <div className="hidden md:block absolute left-[25%] top-0 bottom-0 w-0.5 bg-border-dark/10 dark:bg-white/10 -ml-[1px]" />
 
       {dayGroups.map((group, groupIndex) => {
-        const dateInfo = formatDateLabelKorean(group.date);
+        if (!group.date) return null;
+
+        const dateInfo = getDateParts(group.date);
+        const dateLabel = formatDateWithDayEn(group.date);
 
         // Today section header
         if (group.isToday && group.races.length > 0) {
           return (
-            <div key={group.date.toISOString()}>
+            <div key={group.date}>
               {/* TODAY Header */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 relative mb-8">
                 <div className="md:col-span-3 text-right pr-8 relative pt-1">
@@ -61,10 +43,11 @@ export function ScheduleTimeline({ dayGroups }: ScheduleTimelineProps) {
                       TODAY
                     </span>
                     <h3 className="text-4xl md:text-5xl font-black text-border-dark dark:text-white uppercase italic leading-none">
-                      {dateInfo.month}.{dateInfo.day}
+                      {String(dateInfo.month).padStart(2, "0")}.
+                      {String(dateInfo.day).padStart(2, "0")}
                       <br />
                       <span className="text-2xl md:text-3xl not-italic">
-                        ({dateInfo.weekday})
+                        ({dateInfo.weekdayEn})
                       </span>
                     </h3>
                     {group.openCount > 0 && (
@@ -125,7 +108,7 @@ export function ScheduleTimeline({ dayGroups }: ScheduleTimelineProps) {
         if (group.isTomorrow && group.races.length > 0) {
           return (
             <div
-              key={group.date.toISOString()}
+              key={group.date}
               className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-16 relative"
             >
               <div className="md:col-span-3 text-right pr-8 relative pt-2">
@@ -133,7 +116,7 @@ export function ScheduleTimeline({ dayGroups }: ScheduleTimelineProps) {
                   TOMORROW
                 </span>
                 <h3 className="text-3xl font-black text-gray-600 dark:text-gray-300 uppercase">
-                  {formatDateLabel(group.date)}
+                  {dateLabel}
                 </h3>
                 <div className="hidden md:block absolute right-[-5px] top-4 size-4 bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-full z-10 translate-x-[50%]" />
               </div>
@@ -154,7 +137,7 @@ export function ScheduleTimeline({ dayGroups }: ScheduleTimelineProps) {
         // Past days or future days
         return (
           <div
-            key={group.date.toISOString()}
+            key={group.date}
             className={`grid grid-cols-1 md:grid-cols-12 gap-8 mb-4 relative ${group.isPast ? "opacity-80" : ""} group`}
           >
             <div className="md:col-span-3 text-right pr-8 relative">
@@ -164,7 +147,7 @@ export function ScheduleTimeline({ dayGroups }: ScheduleTimelineProps) {
                     Past
                   </span>
                   <h3 className="text-xl font-black text-gray-400 decoration-2 line-through decoration-gray-400">
-                    {formatDateLabel(group.date)}
+                    {dateLabel}
                   </h3>
                 </>
               ) : group.isToday ? (
@@ -173,7 +156,7 @@ export function ScheduleTimeline({ dayGroups }: ScheduleTimelineProps) {
                     Today
                   </span>
                   <h3 className="text-2xl font-bold text-border-dark dark:text-gray-300">
-                    {formatDateLabel(group.date)}
+                    {dateLabel}
                   </h3>
                 </>
               ) : group.isTomorrow ? (
@@ -182,7 +165,7 @@ export function ScheduleTimeline({ dayGroups }: ScheduleTimelineProps) {
                     Tomorrow
                   </span>
                   <h3 className="text-2xl font-bold text-gray-400 dark:text-gray-400">
-                    {formatDateLabel(group.date)}
+                    {dateLabel}
                   </h3>
                 </>
               ) : (
@@ -191,7 +174,7 @@ export function ScheduleTimeline({ dayGroups }: ScheduleTimelineProps) {
                     Upcoming
                   </span>
                   <h3 className="text-2xl font-bold text-gray-300 dark:text-gray-600">
-                    {formatDateLabel(group.date)}
+                    {dateLabel}
                   </h3>
                 </>
               )}

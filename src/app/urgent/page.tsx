@@ -3,6 +3,21 @@ import { prisma } from "@/lib/prisma";
 import { Header } from "@/components/layout";
 import { WheelList } from "@/components/features/urgent/WheelList";
 import type { RaceWithCategories } from "@/types";
+import {
+  todayKST,
+  startOfDayKST,
+  getWeekRangeKST,
+  getWeekDatesKST,
+  isSameDayKST,
+  isPastKST,
+  isTodayKST,
+  isTomorrowKST,
+  formatTime,
+  toKST,
+  nowKST,
+  serializeDate,
+} from "@/lib/date";
+import { parseISO, isBefore, isAfter } from "date-fns";
 
 interface UrgentPageProps {
   searchParams: Promise<{
@@ -10,59 +25,25 @@ interface UrgentPageProps {
   }>;
 }
 
-// Get week boundaries (Monday to Sunday)
-function getWeekBoundaries(date: Date) {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-
-  const weekStart = new Date(d.setDate(diff));
-  weekStart.setHours(0, 0, 0, 0);
-
-  const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekStart.getDate() + 6);
-  weekEnd.setHours(23, 59, 59, 999);
-
-  return { weekStart, weekEnd };
-}
-
-// Generate array of dates for the week
-function getWeekDates(weekStart: Date): Date[] {
-  const dates: Date[] = [];
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(weekStart);
-    date.setDate(weekStart.getDate() + i);
-    dates.push(date);
-  }
-  return dates;
-}
-
-// Check if two dates are the same day
-function isSameDay(d1: Date, d2: Date): boolean {
-  return (
-    d1.getFullYear() === d2.getFullYear() &&
-    d1.getMonth() === d2.getMonth() &&
-    d1.getDate() === d2.getDate()
-  );
-}
-
 export default async function UrgentPage({ searchParams }: UrgentPageProps) {
   const params = await searchParams;
-  const now = new Date();
 
-  // Parse week parameter or use current week
-  let baseDate = now;
+  // KST 기준 오늘 날짜
+  const today = todayKST();
+
+  // week 파라미터 파싱 또는 현재 주 사용
+  let baseDate = today;
   if (params.week) {
-    const parsed = new Date(params.week);
+    const parsed = parseISO(params.week);
     if (!isNaN(parsed.getTime())) {
-      baseDate = parsed;
+      baseDate = startOfDayKST(parsed);
     }
   }
 
-  const { weekStart, weekEnd } = getWeekBoundaries(baseDate);
-  const weekDates = getWeekDates(weekStart);
+  const { weekStart, weekEnd } = getWeekRangeKST(baseDate);
+  const weekDates = getWeekDatesKST(weekStart);
 
-  // 단순하게: 접수시작일이 이번 주에 있는 대회만 조회
+  // 접수시작일이 이번 주에 있는 대회 조회
   const races = await prisma.race.findMany({
     where: {
       registrationStart: {
@@ -78,12 +59,7 @@ export default async function UrgentPage({ searchParams }: UrgentPageProps) {
     },
   });
 
-  // 오늘 날짜 (시간 제외)
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
+  const now = nowKST();
 
   // 상태 결정 함수: RaceCategory.status 우선, 그 다음 스케줄 기반
   function determineRaceStatus(
@@ -103,18 +79,18 @@ export default async function UrgentPage({ searchParams }: UrgentPageProps) {
         (cat) => cat.status === "UPCOMING"
       );
       if (hasUpcoming) {
-        // 2순위~4순위: 시간 기반 판단
+        // 시간 기반 판단
         const regStart = race.registrationStart
-          ? new Date(race.registrationStart)
+          ? toKST(race.registrationStart)
           : null;
         const regEnd = race.registrationEnd
-          ? new Date(race.registrationEnd)
+          ? toKST(race.registrationEnd)
           : null;
 
-        if (regStart && now < regStart) return "upcoming"; // 아직 시작 전
-        if (regStart && regEnd && now >= regStart && now <= regEnd)
-          return "open"; // 접수 기간 중
-        if (regEnd && now > regEnd) return "closed"; // 기간 종료
+        if (regStart && isBefore(now, regStart)) return "upcoming";
+        if (regStart && regEnd && !isBefore(now, regStart) && !isAfter(now, regEnd))
+          return "open";
+        if (regEnd && isAfter(now, regEnd)) return "closed";
 
         return "upcoming";
       }
@@ -122,13 +98,16 @@ export default async function UrgentPage({ searchParams }: UrgentPageProps) {
 
     // 레거시: RaceCategory 없으면 날짜 기반으로만 판단
     const regStart = race.registrationStart
-      ? new Date(race.registrationStart)
+      ? toKST(race.registrationStart)
       : null;
-    const regEnd = race.registrationEnd ? new Date(race.registrationEnd) : null;
+    const regEnd = race.registrationEnd
+      ? toKST(race.registrationEnd)
+      : null;
 
-    if (regEnd && now > regEnd) return "closed";
-    if (regStart && regEnd && now >= regStart && now <= regEnd) return "open";
-    if (regStart && now < regStart) return "upcoming";
+    if (regEnd && isAfter(now, regEnd)) return "closed";
+    if (regStart && regEnd && !isBefore(now, regStart) && !isAfter(now, regEnd))
+      return "open";
+    if (regStart && isBefore(now, regStart)) return "upcoming";
 
     return "upcoming";
   }
@@ -144,17 +123,14 @@ export default async function UrgentPage({ searchParams }: UrgentPageProps) {
     races.forEach((race) => {
       if (!race.registrationStart) return;
 
-      const regStart = new Date(race.registrationStart);
+      const regStart = race.registrationStart;
 
-      // 접수시작일이 이 날짜와 같은 경우만
-      if (isSameDay(regStart, date)) {
-        // 상태 결정: RaceCategory.status 우선순위 적용
+      // 접수시작일이 이 날짜와 같은 경우만 (KST 기준)
+      if (isSameDayKST(regStart, date)) {
         const status = determineRaceStatus(race);
 
-        // 시간 추출
-        const hours = String(regStart.getHours()).padStart(2, "0");
-        const minutes = String(regStart.getMinutes()).padStart(2, "0");
-        let time = `${hours}:${minutes}`;
+        // 시간 추출 (KST 기준)
+        let time = formatTime(regStart);
         if (time === "00:00") time = "10:00"; // 기본값
 
         racesForDay.push({ race, status, time });
@@ -167,11 +143,11 @@ export default async function UrgentPage({ searchParams }: UrgentPageProps) {
     const openCount = racesForDay.filter((r) => r.status === "open").length;
 
     return {
-      date,
+      date: serializeDate(date), // ISO 문자열로 직렬화
       races: racesForDay,
-      isPast: new Date(date).setHours(0, 0, 0, 0) < today.getTime(),
-      isToday: isSameDay(date, today),
-      isTomorrow: isSameDay(date, tomorrow),
+      isPast: isPastKST(date),
+      isToday: isTodayKST(date),
+      isTomorrow: isTomorrowKST(date),
       openCount,
     };
   });
