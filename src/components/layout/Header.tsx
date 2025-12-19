@@ -1,37 +1,69 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
+  const pathname = usePathname();
+  const isUrgentPage = pathname === "/urgent";
+  const isHomePage = pathname === "/";
+
   return (
     <header className="w-full bg-background-light dark:bg-background-dark border-b-4 border-border-dark dark:border-white sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="size-10 bg-primary border-2 border-border-dark rounded-full flex items-center justify-center shadow-[var(--shadow-neobrutalism-sm)]">
-            <span
-              className="material-symbols-outlined text-border-dark"
-              style={{ fontSize: "24px" }}
-            >
-              directions_run
-            </span>
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight uppercase italic">
-            러너스 하이
-          </h1>
-        </Link>
-
-        <div className="flex items-center gap-3">
-          <div className="hidden md:flex items-center">
-            <div className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-full px-4 py-1.5 font-bold text-sm shadow-[var(--shadow-neobrutalism-sm)] flex items-center gap-2">
-              <span className="size-2 rounded-full bg-green-500 animate-pulse" />
-              국내 행사
+      <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
+        {/* Logo */}
+        <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="size-10 bg-primary border-2 border-border-dark rounded-full flex items-center justify-center shadow-[var(--shadow-neobrutalism-sm)]">
+              <span
+                className="material-symbols-outlined text-border-dark"
+                style={{ fontSize: "24px" }}
+              >
+                directions_run
+              </span>
             </div>
-          </div>
-          <ThemeToggle />
+            <h1 className="text-2xl font-black tracking-tighter uppercase italic">
+              RUNNER&apos;S HIGH
+            </h1>
+          </Link>
           <button className="md:hidden p-2" aria-label="메뉴 열기">
             <span className="material-symbols-outlined">menu</span>
           </button>
+        </div>
+
+        {/* Navigation Tabs */}
+        <nav className="flex items-center gap-3 bg-white dark:bg-background-dark p-1.5 rounded-full border-2 border-border-dark dark:border-white shadow-[var(--shadow-neobrutalism-sm)]">
+          <Link
+            href="/urgent"
+            className={`px-6 py-2 rounded-full font-black text-sm uppercase flex items-center gap-2 transition-colors ${
+              isUrgentPage
+                ? "bg-primary border-2 border-border-dark shadow-sm"
+                : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
+            }`}
+          >
+            <span className="material-symbols-outlined text-lg">timer</span>
+            접수임박
+          </Link>
+          <Link
+            href="/"
+            className={`px-6 py-2 rounded-full font-bold text-sm uppercase transition-colors ${
+              isHomePage
+                ? "bg-primary border-2 border-border-dark shadow-sm"
+                : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
+            }`}
+          >
+            전체 대회 보기
+          </Link>
+        </nav>
+
+        {/* Right Side */}
+        <div className="hidden md:flex items-center gap-4">
+          <div className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-full px-4 py-1.5 font-bold text-sm shadow-[var(--shadow-neobrutalism-sm)] flex items-center gap-2 hover:bg-gray-50 cursor-pointer">
+            <span className="size-2 rounded-full bg-green-500 animate-pulse" />
+            Seoul, KR
+          </div>
+          <ThemeToggle />
         </div>
       </div>
     </header>
