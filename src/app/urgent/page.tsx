@@ -88,6 +88,54 @@ export default async function UrgentPage({ searchParams }: UrgentPageProps) {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
+  // 상태 결정 함수: RaceCategory.status 우선, 그 다음 스케줄 기반
+  function determineRaceStatus(
+    race: RaceWithCategories
+  ): "closed" | "open" | "upcoming" {
+    // 1순위: RaceCategory.status가 CLOSED면 무조건 마감
+    if (race.categories && race.categories.length > 0) {
+      const allClosed = race.categories.every((cat) => cat.status === "CLOSED");
+      if (allClosed) return "closed";
+
+      // 하나라도 OPEN이면 접수중
+      const hasOpen = race.categories.some((cat) => cat.status === "OPEN");
+      if (hasOpen) return "open";
+
+      // 하나라도 CANCELLED가 아닌 UPCOMING이 있으면 접수예정
+      const hasUpcoming = race.categories.some(
+        (cat) => cat.status === "UPCOMING"
+      );
+      if (hasUpcoming) {
+        // 2순위~4순위: 시간 기반 판단
+        const regStart = race.registrationStart
+          ? new Date(race.registrationStart)
+          : null;
+        const regEnd = race.registrationEnd
+          ? new Date(race.registrationEnd)
+          : null;
+
+        if (regStart && now < regStart) return "upcoming"; // 아직 시작 전
+        if (regStart && regEnd && now >= regStart && now <= regEnd)
+          return "open"; // 접수 기간 중
+        if (regEnd && now > regEnd) return "closed"; // 기간 종료
+
+        return "upcoming";
+      }
+    }
+
+    // 레거시: RaceCategory 없으면 날짜 기반으로만 판단
+    const regStart = race.registrationStart
+      ? new Date(race.registrationStart)
+      : null;
+    const regEnd = race.registrationEnd ? new Date(race.registrationEnd) : null;
+
+    if (regEnd && now > regEnd) return "closed";
+    if (regStart && regEnd && now >= regStart && now <= regEnd) return "open";
+    if (regStart && now < regStart) return "upcoming";
+
+    return "upcoming";
+  }
+
   // 날짜별로 그룹화: 접수시작일이 그 날인 대회만
   const dayGroups = weekDates.map((date) => {
     const racesForDay: Array<{
@@ -103,18 +151,8 @@ export default async function UrgentPage({ searchParams }: UrgentPageProps) {
 
       // 접수시작일이 이 날짜와 같은 경우만
       if (isSameDay(regStart, date)) {
-        // 상태 결정: 오늘 기준
-        const dateStart = new Date(date);
-        dateStart.setHours(0, 0, 0, 0);
-
-        let status: "closed" | "open" | "upcoming";
-        if (dateStart < today) {
-          status = "closed"; // 과거
-        } else if (isSameDay(date, today)) {
-          status = "open"; // 오늘
-        } else {
-          status = "upcoming"; // 미래
-        }
+        // 상태 결정: RaceCategory.status 우선순위 적용
+        const status = determineRaceStatus(race);
 
         // 시간 추출
         const hours = String(regStart.getHours()).padStart(2, "0");
