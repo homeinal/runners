@@ -35,7 +35,7 @@ function formatDateLabelKorean(date: Date): {
 } {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
-  const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+  const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; // 영문 요일로 변경 (디자인 시안 맞춤)
   const weekday = weekdays[date.getDay()];
   return { month, day, weekday, formatted: `${month}.${day}\n(${weekday})` };
 }
@@ -57,7 +57,7 @@ export function ScheduleTimeline({ dayGroups }: ScheduleTimelineProps) {
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 relative mb-8">
                 <div className="md:col-span-3 text-right pr-8 relative pt-1">
                   <div className="sticky top-[120px]">
-                    <span className="text-secondary font-black text-sm uppercase tracking-widest animate-pulse">
+                    <span className="text-[#FF6B6B] font-black text-sm uppercase tracking-widest animate-pulse">
                       TODAY
                     </span>
                     <h3 className="text-4xl md:text-5xl font-black text-border-dark dark:text-white uppercase italic leading-none">
@@ -68,7 +68,7 @@ export function ScheduleTimeline({ dayGroups }: ScheduleTimelineProps) {
                       </span>
                     </h3>
                     {group.openCount > 0 && (
-                      <span className="inline-block mt-2 px-2 py-1 bg-border-dark text-primary text-xs font-black uppercase rounded rotate-3">
+                      <span className="inline-block mt-2 px-2 py-1 bg-border-dark text-primary text-xs font-black uppercase rounded rotate-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)]">
                         {group.openCount}개 오픈
                       </span>
                     )}
@@ -76,8 +76,8 @@ export function ScheduleTimeline({ dayGroups }: ScheduleTimelineProps) {
                   </div>
                 </div>
                 <div className="md:col-span-9">
-                  <div className="flex items-center gap-3">
-                    <div className="inline-flex items-center gap-2 bg-border-dark text-white px-4 py-1.5 rounded-lg shadow-[var(--shadow-neobrutalism-sm)] -rotate-1">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="inline-flex items-center gap-2 bg-border-dark text-white px-4 py-1.5 rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] -rotate-1">
                       <span className="material-symbols-outlined text-primary text-xl">
                         campaign
                       </span>
@@ -85,41 +85,38 @@ export function ScheduleTimeline({ dayGroups }: ScheduleTimelineProps) {
                         오늘 접수 시작
                       </span>
                     </div>
-                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
-                      Don&apos;t miss the timeline
-                    </span>
                   </div>
+
+                  {/* Group races by time */}
+                  {groupRacesByTime(group.races).map((timeGroup) => (
+                    <div
+                      key={timeGroup.time || "no-time"}
+                      className="grid grid-cols-1 md:grid-cols-12 gap-8 relative mb-6 last:mb-0"
+                    >
+                      <div className="md:col-span-3 text-right pr-8 relative pt-2">
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">
+                          {timeGroup.period}
+                        </span>
+                        <span className="text-xl font-black text-border-dark dark:text-white block">
+                          {timeGroup.time || "시간 미정"}
+                        </span>
+                        <div className="hidden md:block absolute right-[-5px] top-4 size-3 bg-white border-2 border-border-dark rounded-full z-10 translate-x-[50%]" />
+                      </div>
+                      <div className="md:col-span-9 space-y-4">
+                        {timeGroup.races.map(({ race, status, time }) => (
+                          <ScheduleCard
+                            key={race.id}
+                            race={race}
+                            status={status}
+                            time={time}
+                            showTopPick={status === "open"}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-
-              {/* Group races by time */}
-              {groupRacesByTime(group.races).map((timeGroup) => (
-                <div
-                  key={timeGroup.time || "no-time"}
-                  className="grid grid-cols-1 md:grid-cols-12 gap-8 relative mb-6"
-                >
-                  <div className="md:col-span-3 text-right pr-8 relative pt-2">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">
-                      {timeGroup.period}
-                    </span>
-                    <span className="text-xl font-black text-border-dark dark:text-white block">
-                      {timeGroup.time || "시간 미정"}
-                    </span>
-                    <div className="hidden md:block absolute right-[-5px] top-4 size-3 bg-white border-2 border-border-dark rounded-full z-10 translate-x-[50%]" />
-                  </div>
-                  <div className="md:col-span-9 space-y-4">
-                    {timeGroup.races.map(({ race, status, time }) => (
-                      <ScheduleCard
-                        key={race.id}
-                        race={race}
-                        status={status}
-                        time={time}
-                        showTopPick={status === "open"}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
             </div>
           );
         }
@@ -167,6 +164,24 @@ export function ScheduleTimeline({ dayGroups }: ScheduleTimelineProps) {
                     Past
                   </span>
                   <h3 className="text-xl font-black text-gray-400 decoration-2 line-through decoration-gray-400">
+                    {formatDateLabel(group.date)}
+                  </h3>
+                </>
+              ) : group.isToday ? (
+                <>
+                  <span className="text-[#FF6B6B] font-bold text-sm uppercase">
+                    Today
+                  </span>
+                  <h3 className="text-2xl font-bold text-border-dark dark:text-gray-300">
+                    {formatDateLabel(group.date)}
+                  </h3>
+                </>
+              ) : group.isTomorrow ? (
+                <>
+                  <span className="text-gray-500 font-bold text-sm uppercase">
+                    Tomorrow
+                  </span>
+                  <h3 className="text-2xl font-bold text-gray-400 dark:text-gray-400">
                     {formatDateLabel(group.date)}
                   </h3>
                 </>

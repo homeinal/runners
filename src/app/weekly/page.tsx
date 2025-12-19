@@ -13,57 +13,71 @@ interface UrgentPageProps {
   }>;
 }
 
-// Get week boundaries (Monday to Sunday)
-function getWeekBoundaries(date: Date) {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+const KST_OFFSET = 9 * 60 * 60 * 1000; // milliseconds
 
-  const weekStart = new Date(d.setDate(diff));
-  weekStart.setHours(0, 0, 0, 0);
+// KST 자정으로 내리는 함수 (문자열 파싱 없이 오프셋 기반)
+function startOfDayKST(date: Date) {
+  const utcMs = date.getTime();
+  const kstMs = utcMs + KST_OFFSET;
+  const startKstMs = Math.floor(kstMs / 86_400_000) * 86_400_000;
+  const startUtcMs = startKstMs - KST_OFFSET;
+  return new Date(startUtcMs);
+}
 
-  const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekStart.getDate() + 6);
-  weekEnd.setHours(23, 59, 59, 999);
+// KST 기준 요일(0=Sun) 가져오기
+function getKstDay(date: Date) {
+  const kst = new Date(date.getTime() + KST_OFFSET);
+  return kst.getUTCDay();
+}
 
+// KST 기준 주간 범위 (월~일)
+function getWeekBoundariesKST(date: Date) {
+  const base = startOfDayKST(date);
+  const day = getKstDay(base); // 0=Sun ... 6=Sat in KST
+  const diff = day === 0 ? -6 : 1 - day; // move to Monday
+
+  const weekStart = new Date(base.getTime() + diff * 86_400_000);
+  const weekEnd = new Date(weekStart.getTime() + 6 * 86_400_000 + (86_400_000 - 1));
   return { weekStart, weekEnd };
 }
 
-// Generate array of dates for the week
-function getWeekDates(weekStart: Date): Date[] {
+// KST 기준 주간 날짜 배열
+function getWeekDatesKST(weekStart: Date): Date[] {
   const dates: Date[] = [];
   for (let i = 0; i < 7; i++) {
-    const date = new Date(weekStart);
-    date.setDate(weekStart.getDate() + i);
-    dates.push(date);
+    dates.push(new Date(weekStart.getTime() + i * 86_400_000));
   }
   return dates;
 }
 
-// Check if two dates are the same day
-function isSameDay(d1: Date, d2: Date): boolean {
-  return (
-    d1.getFullYear() === d2.getFullYear() &&
-    d1.getMonth() === d2.getMonth() &&
-    d1.getDate() === d2.getDate()
-  );
+function isSameDayKST(d1: Date, d2: Date): boolean {
+  return startOfDayKST(d1).getTime() === startOfDayKST(d2).getTime();
+}
+
+// KST 기준의 오늘 날짜(00:00:00)
+function getTodayKST() {
+  return startOfDayKST(new Date());
 }
 
 export default async function WeeklyPage({ searchParams }: UrgentPageProps) {
   const params = await searchParams;
-  const now = new Date();
 
-  // Parse week parameter or use current week
-  let baseDate = now;
+  // 한국 시간 기준의 오늘 날짜 생성
+  const todayKST = getTodayKST();
+
+  // Parse week parameter or use current week (based on KST today)
+  let baseDate = todayKST;
   if (params.week) {
     const parsed = new Date(params.week);
     if (!isNaN(parsed.getTime())) {
       baseDate = parsed;
+      // 파라미터 날짜를 KST 자정으로 보정
+      baseDate = startOfDayKST(baseDate);
     }
   }
 
-  const { weekStart, weekEnd } = getWeekBoundaries(baseDate);
-  const weekDates = getWeekDates(weekStart);
+  const { weekStart, weekEnd } = getWeekBoundariesKST(baseDate);
+  const weekDates = getWeekDatesKST(weekStart);
 
   // 단순하게: 접수시작일이 이번 주에 있는 대회만 조회
   const races = await prisma.race.findMany({
@@ -81,12 +95,7 @@ export default async function WeeklyPage({ searchParams }: UrgentPageProps) {
     },
   });
 
-  // 오늘 날짜 (시간 제외)
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
+  const now = new Date(); // 로직 비교용 현재 시간 (UTC 등 서버 시간)
 
   // 상태 결정 함수: RaceCategory.status 우선, 그 다음 스케줄 기반
   function determineRaceStatus(
@@ -149,8 +158,8 @@ export default async function WeeklyPage({ searchParams }: UrgentPageProps) {
 
       const regStart = new Date(race.registrationStart);
 
-      // 접수시작일이 이 날짜와 같은 경우만
-      if (isSameDay(regStart, date)) {
+      // 접수시작일이 이 날짜와 같은 경우만 (KST 기준)
+      if (isSameDayKST(regStart, date)) {
         // 상태 결정: RaceCategory.status 우선순위 적용
         const status = determineRaceStatus(race);
 
@@ -169,12 +178,15 @@ export default async function WeeklyPage({ searchParams }: UrgentPageProps) {
 
     const openCount = racesForDay.filter((r) => r.status === "open").length;
 
+    const targetDate = startOfDayKST(date);
+    const todayTarget = startOfDayKST(todayKST);
+
     return {
       date,
       races: racesForDay,
-      isPast: new Date(date).setHours(0, 0, 0, 0) < today.getTime(),
-      isToday: isSameDay(date, today),
-      isTomorrow: isSameDay(date, tomorrow),
+      isPast: targetDate.getTime() < todayTarget.getTime(),
+      isToday: targetDate.getTime() === todayTarget.getTime(),
+      isTomorrow: targetDate.getTime() === todayTarget.getTime() + 86_400_000, // 24시간 후
       openCount,
     };
   });
@@ -185,7 +197,7 @@ export default async function WeeklyPage({ searchParams }: UrgentPageProps) {
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-8">
         <Suspense fallback={<div className="h-24" />}>
           <WeekNavigator
-            currentDate={now}
+            currentDate={todayKST} // KST 오늘 날짜 전달
             weekStart={weekStart}
             weekEnd={weekEnd}
           />

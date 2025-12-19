@@ -1,8 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState, useEffect } from "react";
-import { useDebounce } from "@/hooks/useDebounce"; // Debounce hook might be needed, or simple enter key
+import { useCallback, useState } from "react";
 
 const SORT_OPTIONS = [
   { value: "registration", label: "접수시작일순" },

@@ -28,7 +28,7 @@ function formatDateLabelKorean(date: Date): {
 } {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
-  const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+  const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; // 디자인 시안에 맞게 영문 요일로 변경
   const weekday = weekdays[date.getDay()];
   return { month, day, weekday };
 }
@@ -161,7 +161,7 @@ export function WheelList({ dayGroups }: WheelListProps) {
                         <div>
                             <div className="flex items-center gap-2">
                                 <span className="text-2xl font-black uppercase text-border-dark dark:text-white">{dateInfo.weekday}</span>
-                                {group.isToday && <span className="px-2 py-0.5 bg-red-500 text-white text-[10px] font-black uppercase rounded-full animate-pulse">Today</span>}
+                                {group.isToday && <span className="px-2 py-0.5 bg-[#FF6B6B] text-white text-[10px] font-black uppercase rounded-full animate-pulse shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)]">Today</span>}
                             </div>
                             <span className="text-sm font-bold text-gray-400">{group.date.getFullYear()}</span>
                         </div>
@@ -207,4 +207,3 @@ export function WheelList({ dayGroups }: WheelListProps) {
     </div>
   );
 }
-
