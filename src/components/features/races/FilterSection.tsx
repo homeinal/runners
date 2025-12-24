@@ -10,7 +10,7 @@ const SORT_OPTIONS = [
 
 const STATUS_OPTIONS = [
   { value: "전체", label: "전체" },
-  { value: "upcoming", label: "시작전" },
+  { value: "upcoming", label: "접수전" },
   { value: "open", label: "접수중" },
   { value: "closed", label: "마감" },
 ];
