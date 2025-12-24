@@ -214,12 +214,6 @@ export function ScheduleCard({
             </button>
           ) : (
             <>
-              <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden border border-border-dark">
-                <div className="h-full bg-green-500 w-[75%]" />
-              </div>
-              <span className="text-[9px] font-black text-green-700 uppercase">
-                여유 있음
-              </span>
               <Link
                 href={`/races/${race.id}`}
                 className="w-full bg-primary text-border-dark border-2 border-border-dark py-2 rounded font-black text-xs uppercase shadow-[var(--shadow-neobrutalism-sm)] hover:shadow-[var(--shadow-neobrutalism-active)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-1"
