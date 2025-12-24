@@ -21,11 +21,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
 
   if (!race) {
-    return { title: "대회를 찾을 수 없습니다 - 러너스하이" };
+    return { title: "대회를 찾을 수 없습니다 - 매달" };
   }
 
   return {
-    title: `${race.title} - 러너스하이`,
+    title: `${race.title} - 매달`,
     description: `${race.region || race.country}에서 열리는 ${race.title} 대회 정보`,
     openGraph: {
       title: race.title,
@@ -104,7 +104,7 @@ export default async function RaceDetailPage({ params }: PageProps) {
 
         {/* Footer links */}
         <footer className="w-full py-8 mt-4 border-t-2 border-black flex flex-col md:flex-row justify-between items-center gap-4 text-sm font-medium uppercase opacity-60">
-          <p>© 2024 러너스 하이. All rights reserved.</p>
+          <p>© 2025 매달. All rights reserved.</p>
           <div className="flex gap-4">
             <Link href="#" className="hover:underline">
               개인정보 처리방침

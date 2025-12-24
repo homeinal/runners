@@ -25,7 +25,7 @@ export function Header() {
               </span>
             </div>
             <h1 className="text-2xl font-black tracking-tighter uppercase italic">
-              RUNNER&apos;S HIGH
+              MAEDAL
             </h1>
           </Link>
           <button className="md:hidden p-2" aria-label="메뉴 열기">

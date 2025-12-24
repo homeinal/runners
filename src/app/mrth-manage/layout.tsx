@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "관리자 - Runner's High",
+  title: "관리자 - Maedal",
   robots: { index: false, follow: false },
 };
 

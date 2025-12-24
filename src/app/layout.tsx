@@ -11,7 +11,7 @@ const notoSansKR = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: "러너스하이 - 국내외 마라톤 대회 정보",
+  title: "매달 - 국내외 마라톤 대회 정보",
   description:
     "마라톤, 하프마라톤, 러닝 대회 일정을 한눈에. 접수 중인 대회를 지금 확인하세요.",
   keywords: [
@@ -24,10 +24,10 @@ export const metadata: Metadata = {
     "풀마라톤",
   ],
   openGraph: {
-    title: "러너스하이",
+    title: "매달",
     description: "국내외 마라톤 대회 정보",
-    url: "https://runners-high.com",
-    siteName: "러너스하이",
+    url: "https://maedal.com",
+    siteName: "매달",
     locale: "ko_KR",
     type: "website",
   },

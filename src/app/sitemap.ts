@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import type { MetadataRoute } from "next";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://runners-high.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://maedal.com";
 
   // Fetch all races
   const races = await prisma.race.findMany({
