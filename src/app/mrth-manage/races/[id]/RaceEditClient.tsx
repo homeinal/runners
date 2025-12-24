@@ -118,7 +118,7 @@ export default function RaceEditClient({ race: initialRace }: Props) {
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => router.push("/admin/dashboard")}
+              onClick={() => router.push("/mrth-manage/dashboard")}
               className="text-gray-600 hover:text-gray-900"
             >
               ← 목록으로

@@ -15,7 +15,7 @@ export default function AdminDashboardClient({ races }: Props) {
 
   const handleLogout = async () => {
     await fetch("/api/admin/auth", { method: "DELETE" });
-    router.push("/admin");
+    router.push("/mrth-manage");
   };
 
   const filteredRaces = races.filter((race) => {
@@ -199,7 +199,7 @@ export default function AdminDashboardClient({ races }: Props) {
                     <td className="px-4 py-4 text-center">
                       <button
                         onClick={() =>
-                          router.push(`/admin/races/${race.id}`)
+                          router.push(`/mrth-manage/races/${race.id}`)
                         }
                         className="px-3 py-1.5 bg-black text-white text-sm rounded-lg hover:bg-gray-800 transition-colors"
                       >

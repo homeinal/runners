@@ -17,7 +17,7 @@ export default async function RaceEditPage({ params }: Props) {
   const isAuthenticated = await checkAuth();
 
   if (!isAuthenticated) {
-    redirect("/admin");
+    redirect("/mrth-manage");
   }
 
   const { id } = await params;

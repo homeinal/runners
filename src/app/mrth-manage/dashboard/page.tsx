@@ -13,7 +13,7 @@ export default async function AdminDashboardPage() {
   const isAuthenticated = await checkAuth();
 
   if (!isAuthenticated) {
-    redirect("/admin");
+    redirect("/mrth-manage");
   }
 
   const races = await prisma.race.findMany({
