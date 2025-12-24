@@ -197,14 +197,26 @@ export default function AdminDashboardClient({ races }: Props) {
                       {race.categories.length}개
                     </td>
                     <td className="px-4 py-4 text-center">
-                      <button
-                        onClick={() =>
-                          router.push(`/mrth-manage/races/${race.id}`)
-                        }
-                        className="px-3 py-1.5 bg-black text-white text-sm rounded-lg hover:bg-gray-800 transition-colors"
-                      >
-                        수정
-                      </button>
+                      <div className="flex items-center justify-center gap-2">
+                        {race.website && (
+                          <a
+                            href={race.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-100 transition-colors"
+                          >
+                            홈페이지
+                          </a>
+                        )}
+                        <button
+                          onClick={() =>
+                            router.push(`/mrth-manage/races/${race.id}`)
+                          }
+                          className="px-3 py-1.5 bg-black text-white text-sm rounded-lg hover:bg-gray-800 transition-colors"
+                        >
+                          수정
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
