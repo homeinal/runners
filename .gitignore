@@ -45,6 +45,9 @@ pids
 .env*
 !.env.example
 
+# local-only scripts
+prisma/migrate-data.ts
+
 # vercel
 .vercel
 
