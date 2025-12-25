@@ -158,6 +158,8 @@ async function verifyMigration() {
 
 async function main() {
   try {
+    console.log("이 스크립트는 로컬/수동 실행용입니다. CI에서는 건너뜀.");
+    process.exit(0);
     await migrateData();
     await verifyMigration();
   } catch (error) {
