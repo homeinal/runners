@@ -74,14 +74,14 @@ export function RaceDetail({ race }: RaceDetailProps) {
       </Card>
 
       {/* Registration Section */}
-      <section className="bg-primary border-2 border-border-dark shadow-[var(--shadow-neobrutalism)] p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6 w-full">
+      <section className="bg-primary border-2 border-border-dark shadow-[var(--shadow-neobrutalism)] p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6 w-full text-black dark:text-black">
         <div className="flex flex-col gap-4 w-full md:w-auto">
           <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-4xl">
+            <span className="material-symbols-outlined text-4xl text-black dark:text-black">
               app_registration
             </span>
             <div className="flex flex-col">
-              <span className="text-xs font-bold uppercase mb-0.5">
+              <span className="text-xs font-bold uppercase mb-0.5 text-black dark:text-black">
                 접수 상태
               </span>
               <span className="bg-black text-white px-2 py-0.5 text-sm font-bold uppercase w-fit">
@@ -90,11 +90,11 @@ export function RaceDetail({ race }: RaceDetailProps) {
             </div>
           </div>
           <div className="flex flex-col">
-            <span className="text-xs font-bold uppercase">기간</span>
-            <div className="text-2xl font-black">
+            <span className="text-xs font-bold uppercase text-black dark:text-black">기간</span>
+            <div className="text-2xl font-black text-black dark:text-black">
               {formatRegistrationPeriod(regStart, regEnd)}
             </div>
-            <p className="text-sm font-medium leading-tight mt-1 max-w-sm">
+            <p className="text-sm font-medium leading-tight mt-1 max-w-sm text-black dark:text-black">
               마감 전에 등록하세요. 추가 접수는 불가능합니다.
             </p>
           </div>
@@ -135,8 +135,8 @@ export function RaceDetail({ race }: RaceDetailProps) {
           <div className="flex flex-wrap gap-3">
             {categoryNames.map((categoryName) => (
               <div key={categoryName} className="group relative cursor-pointer">
-                <div className="absolute inset-0 bg-black rounded-full translate-x-1 translate-y-1" />
-                <div className="relative bg-white border-2 border-black rounded-full px-6 py-2 font-bold uppercase text-sm hover:-translate-y-1 hover:-translate-x-1 transition-transform group-hover:bg-primary">
+                <div className="absolute inset-0 bg-black dark:bg-white rounded-full translate-x-1 translate-y-1" />
+                <div className="relative bg-white dark:bg-white border-2 border-black dark:border-white rounded-full px-6 py-2 font-bold uppercase text-sm text-black dark:text-black hover:-translate-y-1 hover:-translate-x-1 transition-transform group-hover:bg-primary">
                   {categoryName}
                 </div>
               </div>
