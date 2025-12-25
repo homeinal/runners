@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * 데이터 마이그레이션 스크립트
  *
@@ -6,7 +7,10 @@
  * 실행: npx ts-node prisma/migrate-data.ts
  */
 
-import { PrismaClient, CategoryStatus, ScheduleType } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
+
+type CategoryStatus = "UPCOMING" | "OPEN" | "CLOSED" | "CANCELLED";
+type ScheduleType = "REGISTRATION" | "PAYMENT";
 
 const prisma = new PrismaClient();
 
