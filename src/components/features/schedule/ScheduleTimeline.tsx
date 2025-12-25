@@ -57,7 +57,7 @@ export function ScheduleTimeline({ dayGroups, viewMode = "week" }: ScheduleTimel
             <div key={group.date}>
               {/* TODAY Header */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 relative mb-8">
-                <div className="md:col-span-3 text-right pr-8 relative pt-1">
+                <div className="md:col-span-3 text-right pr-2 md:pr-4 relative pt-1">
                   <div className="sticky top-[120px]">
                     <span className="text-[#FF6B6B] font-black text-sm uppercase tracking-widest animate-pulse">
                       TODAY
@@ -75,7 +75,7 @@ export function ScheduleTimeline({ dayGroups, viewMode = "week" }: ScheduleTimel
                         {group.openCount}개 오픈
                       </span>
                     )}
-                    <div className="hidden md:flex absolute right-[-5px] top-4 size-6 bg-primary border-4 border-border-dark rounded-full items-center justify-center z-10 shadow-[0_0_0_4px_rgba(249,245,6,0.3)] translate-x-[50%]" />
+                    <div className="hidden md:flex absolute right-0 md:right-[-4px] top-4 size-6 bg-primary border-4 border-border-dark rounded-full items-center justify-center z-10 shadow-[0_0_0_4px_rgba(249,245,6,0.3)] translate-x-1/2" />
                   </div>
                 </div>
                 <div className="md:col-span-9">
@@ -94,18 +94,18 @@ export function ScheduleTimeline({ dayGroups, viewMode = "week" }: ScheduleTimel
                   {groupRacesByTime(group.races).map((timeGroup) => (
                     <div
                       key={timeGroup.time || "no-time"}
-                      className="grid grid-cols-1 md:grid-cols-12 gap-8 relative mb-6 last:mb-0"
+                      className="grid grid-cols-1 md:grid-cols-12 gap-6 relative mb-6 last:mb-0"
                     >
-                      <div className="md:col-span-3 text-right pr-8 relative pt-2">
+                      <div className="md:col-span-2 text-right pr-2 md:pr-3 relative pt-2">
                         <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">
                           {timeGroup.period}
                         </span>
                         <span className="text-xl font-black text-border-dark dark:text-white block">
                           {timeGroup.time || "시간 미정"}
                         </span>
-                        <div className="hidden md:block absolute right-[-5px] top-4 size-3 bg-white border-2 border-border-dark rounded-full z-10 translate-x-[50%]" />
+                        <div className="hidden md:block absolute right-0 md:right-[-4px] top-4 size-3 bg-white border-2 border-border-dark rounded-full z-10 translate-x-1/2" />
                       </div>
-                      <div className="md:col-span-9 space-y-4">
+                      <div className="md:col-span-10 space-y-4">
                         {timeGroup.races.map(({ race, status, time }) => (
                           <ScheduleCard
                             key={race.id}
@@ -131,16 +131,16 @@ export function ScheduleTimeline({ dayGroups, viewMode = "week" }: ScheduleTimel
               key={group.date}
               className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-16 relative"
             >
-              <div className="md:col-span-3 text-right pr-8 relative pt-2">
+              <div className="md:col-span-2 text-right pr-2 md:pr-3 relative pt-2">
                 <span className="text-gray-500 font-black text-sm uppercase">
                   TOMORROW
                 </span>
                 <h3 className="text-3xl font-black text-gray-600 dark:text-gray-300 uppercase">
                   {dateLabel}
                 </h3>
-                <div className="hidden md:block absolute right-[-5px] top-4 size-4 bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-full z-10 translate-x-[50%]" />
+                <div className="hidden md:block absolute right-0 md:right-[-4px] top-4 size-4 bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-full z-10 translate-x-1/2" />
               </div>
-              <div className="md:col-span-9 space-y-6">
+              <div className="md:col-span-10 space-y-6">
                 {group.races.map(({ race, status, time }) => (
                   <ScheduleCard
                     key={race.id}
@@ -160,7 +160,7 @@ export function ScheduleTimeline({ dayGroups, viewMode = "week" }: ScheduleTimel
             key={group.date}
             className={`grid grid-cols-1 md:grid-cols-12 gap-8 mb-4 relative ${group.isPast ? "opacity-80" : ""} group`}
           >
-            <div className="md:col-span-3 text-right pr-8 relative">
+            <div className="md:col-span-3 text-right pr-2 md:pr-4 relative">
               {group.isPast ? (
                 <>
                   <span className="text-xs font-bold text-gray-400 uppercase">
@@ -199,7 +199,7 @@ export function ScheduleTimeline({ dayGroups, viewMode = "week" }: ScheduleTimel
                 </>
               )}
               <div
-                className={`hidden md:block absolute right-[-5px] top-2 size-3 ${group.isPast ? "bg-gray-300 dark:bg-gray-600" : "bg-white border-2 border-gray-300 dark:border-gray-600"} rounded-full z-10 translate-x-[50%]`}
+                className={`hidden md:block absolute right-0 md:right-[-4px] top-2 size-3 ${group.isPast ? "bg-gray-300 dark:bg-gray-600" : "bg-white border-2 border-gray-300 dark:border-gray-600"} rounded-full z-10 translate-x-1/2`}
               />
             </div>
             <div className="md:col-span-9 space-y-4">

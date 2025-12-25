@@ -38,7 +38,7 @@ async function getRegions() {
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const params = await searchParams;
-  const sort = (params.sort || "registration") as SortOption;
+  const sort = (params.sort || "date") as SortOption;
   const region = (params.region || "전체") as RegionFilter;
   const page = parseInt(params.page || "1", 10);
   const status = params.status || "전체";
@@ -54,16 +54,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     where.region = region;
   }
 
-  // Status Filter
-  const now = new Date();
-  if (status === "upcoming") {
-    where.registrationStart = { gt: now };
-  } else if (status === "open") {
-    where.registrationStart = { lte: now };
-    where.registrationEnd = { gte: now };
-  } else if (status === "closed") {
-    where.registrationEnd = { lt: now };
-  }
+  // Status Filter는 카테고리 REGISTRATION 스케줄 기반으로 후처리
 
   // Distance Filter
   if (distance && distance !== "전체") {
@@ -115,36 +106,126 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     ];
   }
 
-  // Build orderBy clause
-  let orderBy: Record<string, string> | Record<string, string>[];
-  switch (sort) {
-    case "registration":
-      orderBy = { registrationStart: "asc" };
-      break;
-    case "popular":
-      orderBy = [{ isFeatured: "desc" }, { eventDate: "asc" }];
-      break;
-    case "date":
-    default:
-      orderBy = { eventDate: "asc" };
-  }
-
-  // Fetch data in parallel
-  const [races, total, regions] = await Promise.all([
+  // 데이터 조회 (정렬/상태 필터는 메모리에서 처리)
+  const [racesRaw, regions] = await Promise.all([
     prisma.race.findMany({
       where,
-      orderBy,
-      take: RACES_PER_PAGE * page,
-      skip: 0,
+      orderBy: { eventDate: "asc" },
       include: {
         categories: {
           include: { schedules: true },
         },
       },
     }),
-    prisma.race.count({ where }),
     getRegions(),
   ]);
+
+  const now = new Date();
+
+  function deriveRegistrationWindow(race: any) {
+    const starts: Date[] = [];
+    const ends: Date[] = [];
+    race.categories?.forEach((cat: any) => {
+      cat.schedules
+        ?.filter((s: any) => s.type === "REGISTRATION")
+        .forEach((s: any) => {
+          if (s.startAt) starts.push(new Date(s.startAt));
+          if (s.endAt) ends.push(new Date(s.endAt));
+        });
+    });
+    // 미래/진행 중 우선: 미래 start가 있으면 그 중 최소, 없으면 진행 중이면 현재로 보정
+    const legacyStart = race.registrationStart ? new Date(race.registrationStart) : null;
+    const legacyEnd = race.registrationEnd ? new Date(race.registrationEnd) : null;
+
+    const futureStarts = starts.filter((d) => d.getTime() >= now.getTime());
+    const minFutureStart =
+      futureStarts.length > 0
+        ? new Date(Math.min(...futureStarts.map((d) => d.getTime())))
+        : null;
+
+    // 진행 중 판단: start가 과거이고 end가 미래면 진행 중
+    const anyOngoing =
+      starts.length > 0 &&
+      starts.some((d, idx) => {
+        const end = ends[idx] || null;
+        const startTime = d.getTime();
+        const endTime = end ? end.getTime() : Number.POSITIVE_INFINITY;
+        return startTime <= now.getTime() && endTime >= now.getTime();
+      });
+
+    let start: Date | null = null;
+    let end: Date | null = null;
+
+    if (minFutureStart) {
+      start = minFutureStart;
+      end =
+        ends.length > 0
+          ? new Date(Math.max(...ends.map((d) => d.getTime())))
+          : legacyEnd;
+    } else if (anyOngoing) {
+      // 진행 중이면 정렬 우선순위를 현재 시각에 가깝게
+      start = new Date(now);
+      end =
+        ends.length > 0
+          ? new Date(Math.max(...ends.map((d) => d.getTime())))
+          : legacyEnd;
+    } else if (starts.length > 0) {
+      // 모두 과거인 경우: 가장 가까운 과거를 사용 (마지막 기회)
+      start = new Date(Math.max(...starts.map((d) => d.getTime())));
+      end =
+        ends.length > 0
+          ? new Date(Math.max(...ends.map((d) => d.getTime())))
+          : legacyEnd;
+    } else {
+      // 스케줄 없으면 레거시로
+      start = legacyStart;
+      end = legacyEnd;
+    }
+
+    return { start, end };
+  }
+
+  function registrationSortScore(race: any) {
+    const { start, end } = deriveRegistrationWindow(race);
+    if (!start) return Number.POSITIVE_INFINITY;
+
+    // 진행 중이면 최우선(0)
+    if (start <= now && (!end || end >= now)) {
+      return 0;
+    }
+
+    // 곧 열리는 순으로
+    if (start > now) {
+      return start.getTime() - now.getTime();
+    }
+
+    // 모두 과거면 큰 페널티를 줘서 뒤로
+    return 1e12 + (now.getTime() - start.getTime());
+  }
+
+  const filteredByStatus = racesRaw.filter((race) => {
+    if (status === "전체" || !status) return true;
+    const { start, end } = deriveRegistrationWindow(race);
+    if (!start && !end) return false;
+    if (status === "upcoming") return !!start && start > now;
+    if (status === "open") return (!!start ? start <= now : true) && (!!end ? end >= now : true);
+    if (status === "closed") return !!end && end < now;
+    return true;
+  });
+
+  const sorted = [...filteredByStatus].sort((a, b) => {
+    if (sort === "registration") {
+      const aScore = registrationSortScore(a);
+      const bScore = registrationSortScore(b);
+      if (aScore !== bScore) return aScore - bScore;
+    } else if (sort === "popular") {
+      if (a.isFeatured !== b.isFeatured) return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
+    }
+    return new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime();
+  });
+
+  const total = sorted.length;
+  const races = sorted.slice(0, RACES_PER_PAGE * page);
 
   // Fetch featured race
   // Only show when no search/filter is active to keep UI clean, 

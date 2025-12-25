@@ -10,6 +10,15 @@ interface RaceCardProps {
 export function RaceCard({ race }: RaceCardProps) {
   const { day, month } = formatDayMonth(race.eventDate);
   const registrationStatus = getRaceRegistrationStatus(race);
+  const categoryNames = Array.from(
+    new Set(
+      (race.categories || []).map(
+        (c) => c.normalizedName || c.name
+      )
+    )
+  );
+  const displayed = categoryNames.slice(0, 3);
+  const overflow = categoryNames.length - displayed.length;
 
   return (
     <Link
@@ -63,6 +72,18 @@ export function RaceCard({ race }: RaceCardProps) {
               {registrationStatus}
             </Badge>
           </div>
+          {displayed.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap mt-2">
+              {displayed.map((name) => (
+                <Badge key={name} variant="outline">
+                  {name}
+                </Badge>
+              ))}
+              {overflow > 0 && (
+                <Badge variant="outline">+{overflow}</Badge>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

@@ -17,6 +17,7 @@ import {
   nowKST,
   serializeDate,
 } from "@/lib/date";
+import { getRaceRegistrationPeriod } from "@/lib/utils";
 import { parseISO, isBefore, isAfter } from "date-fns";
 
 interface UrgentPageProps {
@@ -43,15 +44,34 @@ export default async function UrgentPage({ searchParams }: UrgentPageProps) {
   const { weekStart, weekEnd } = getWeekRangeKST(baseDate);
   const weekDates = getWeekDatesKST(weekStart);
 
-  // 접수시작일이 이번 주에 있는 대회 조회
+  // 카테고리 REGISTRATION 스케줄 기준으로 이번 주 접수 시작 대회 조회 (레거시 보조)
   const races = await prisma.race.findMany({
     where: {
-      registrationStart: {
-        gte: weekStart,
-        lte: weekEnd,
-      },
+      OR: [
+        {
+          categories: {
+            some: {
+              schedules: {
+                some: {
+                  type: "REGISTRATION",
+                  startAt: {
+                    gte: weekStart,
+                    lte: weekEnd,
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          registrationStart: {
+            gte: weekStart,
+            lte: weekEnd,
+          },
+        },
+      ],
     },
-    orderBy: [{ registrationStart: "asc" }, { eventDate: "asc" }],
+    orderBy: [{ eventDate: "asc" }],
     include: {
       categories: {
         include: { schedules: true },
@@ -80,15 +100,14 @@ export default async function UrgentPage({ searchParams }: UrgentPageProps) {
       );
       if (hasUpcoming) {
         // 시간 기반 판단
-        const regStart = race.registrationStart
-          ? toKST(race.registrationStart)
-          : null;
-        const regEnd = race.registrationEnd
-          ? toKST(race.registrationEnd)
-          : null;
+        const { start: regStartRaw, end: regEndRaw } = getRaceRegistrationPeriod(
+          race
+        );
+        const regStart = regStartRaw ? toKST(regStartRaw) : null;
+        const regEnd = regEndRaw ? toKST(regEndRaw) : null;
 
         if (regStart && isBefore(now, regStart)) return "upcoming";
-        if (regStart && regEnd && !isBefore(now, regStart) && !isAfter(now, regEnd))
+        if (regStart && !isBefore(now, regStart) && (!regEnd || !isAfter(now, regEnd)))
           return "open";
         if (regEnd && isAfter(now, regEnd)) return "closed";
 
@@ -97,15 +116,14 @@ export default async function UrgentPage({ searchParams }: UrgentPageProps) {
     }
 
     // 레거시: RaceCategory 없으면 날짜 기반으로만 판단
-    const regStart = race.registrationStart
-      ? toKST(race.registrationStart)
-      : null;
-    const regEnd = race.registrationEnd
-      ? toKST(race.registrationEnd)
-      : null;
+    const { start: regStartRaw, end: regEndRaw } = getRaceRegistrationPeriod(
+      race
+    );
+    const regStart = regStartRaw ? toKST(regStartRaw) : null;
+    const regEnd = regEndRaw ? toKST(regEndRaw) : null;
 
     if (regEnd && isAfter(now, regEnd)) return "closed";
-    if (regStart && regEnd && !isBefore(now, regStart) && !isAfter(now, regEnd))
+    if (regStart && !isBefore(now, regStart) && (!regEnd || !isAfter(now, regEnd)))
       return "open";
     if (regStart && isBefore(now, regStart)) return "upcoming";
 
@@ -121,9 +139,8 @@ export default async function UrgentPage({ searchParams }: UrgentPageProps) {
     }> = [];
 
     races.forEach((race) => {
-      if (!race.registrationStart) return;
-
-      const regStart = race.registrationStart;
+      const { start: regStart } = getRaceRegistrationPeriod(race);
+      if (!regStart) return;
 
       // 접수시작일이 이 날짜와 같은 경우만 (KST 기준)
       if (isSameDayKST(regStart, date)) {

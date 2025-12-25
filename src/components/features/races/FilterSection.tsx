@@ -31,7 +31,7 @@ export function FilterSection({ regions }: FilterSectionProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const currentSort = searchParams.get("sort") || "registration";
+  const currentSort = searchParams.get("sort") || "date";
   const currentRegion = searchParams.get("region") || "전체";
   const currentStatus = searchParams.get("status") || "전체";
   const currentDistance = searchParams.get("distance") || "전체";

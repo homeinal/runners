@@ -148,28 +148,39 @@ export function getRaceRegistrationPeriod(race: {
     }>;
   }>;
 }): { start: Date | null; end: Date | null } {
-  // 우선 레거시 필드 사용
+  // 새 구조: 모든 카테고리의 REGISTRATION 스케줄을 모아 최소 시작~최대 종료 구간 계산
+  if (race.categories && race.categories.length > 0) {
+    const starts: Date[] = [];
+    const ends: Date[] = [];
+
+    race.categories.forEach((cat) => {
+      cat.schedules
+        ?.filter((s) => s.type === "REGISTRATION")
+        .forEach((s) => {
+          if (s.startAt) starts.push(new Date(s.startAt));
+          if (s.endAt) ends.push(new Date(s.endAt));
+        });
+    });
+
+    if (starts.length > 0 || ends.length > 0) {
+      const start =
+        starts.length > 0
+          ? new Date(Math.min(...starts.map((d) => d.getTime())))
+          : null;
+      const end =
+        ends.length > 0
+          ? new Date(Math.max(...ends.map((d) => d.getTime())))
+          : null;
+      return { start, end };
+    }
+  }
+
+  // 레거시 필드로 보조
   if (race.registrationStart || race.registrationEnd) {
     return {
       start: race.registrationStart || null,
       end: race.registrationEnd || null,
     };
-  }
-
-  // 새 구조: 첫 번째 카테고리의 REGISTRATION 스케줄
-  if (race.categories && race.categories.length > 0) {
-    const firstCategory = race.categories[0];
-    if (firstCategory.schedules) {
-      const regSchedule = firstCategory.schedules.find(
-        (s) => s.type === "REGISTRATION"
-      );
-      if (regSchedule) {
-        return {
-          start: regSchedule.startAt || null,
-          end: regSchedule.endAt || null,
-        };
-      }
-    }
   }
 
   return { start: null, end: null };
