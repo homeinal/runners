@@ -27,6 +27,8 @@ import { getRaceRegistrationPeriod } from "@/lib/utils";
 import { parseISO, isBefore, isAfter } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 
+export const revalidate = 43200;
+
 type ViewMode = "week" | "month";
 
 interface WeeklyPageProps {

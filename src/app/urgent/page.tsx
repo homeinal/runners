@@ -21,6 +21,8 @@ import {
 import { getRaceRegistrationPeriod } from "@/lib/utils";
 import { parseISO, isBefore, isAfter } from "date-fns";
 
+export const revalidate = 21600;
+
 interface UrgentPageProps {
   searchParams: Promise<{
     week?: string;

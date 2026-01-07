@@ -6,6 +6,8 @@ import { prisma } from "@/lib/prisma";
 import { Header, Footer } from "@/components/layout";
 import { RaceDetail } from "@/components/features/races";
 
+export const revalidate = 86400;
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }

@@ -9,6 +9,8 @@ import {
 } from "@/components/features/races";
 import type { SortOption, RegionFilter } from "@/types";
 
+export const revalidate = 43200;
+
 const RACES_PER_PAGE = 10;
 
 interface HomePageProps {

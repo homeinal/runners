@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
 async function checkAuth() {
@@ -100,6 +101,11 @@ export async function PUT(request: NextRequest, { params }: Props) {
         categories: true,
       },
     });
+
+    revalidatePath("/");
+    revalidatePath(`/races/${id}`);
+    revalidatePath("/urgent");
+    revalidatePath("/weekly");
 
     return NextResponse.json(updatedRace);
   } catch (error) {
