@@ -11,6 +11,7 @@ const notoSansKR = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://maedal.com"),
   title: "매달 - 국내외 마라톤 대회 정보",
   description:
     "마라톤, 하프마라톤, 러닝 대회 일정을 한눈에. 접수 중인 대회를 지금 확인하세요.",
@@ -30,6 +31,18 @@ export const metadata: Metadata = {
     siteName: "매달",
     locale: "ko_KR",
     type: "website",
+    images: [
+      {
+        url: "https://maedal.com/runner_medal_.png",
+        width: 1024,
+        height: 1024,
+        alt: "Maedal",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    images: ["https://maedal.com/runner_medal_.png"],
   },
 };
 
