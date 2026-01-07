@@ -155,9 +155,9 @@ export function ScheduleCard({
                 NEW
               </span>
             )}
-            {categoryNames.slice(0, 2).map((name) => (
+            {categoryNames.map((name, index) => (
               <span
-                key={name}
+                key={`${name}-${index}`}
                 className={`px-1.5 py-0.5 ${status === "closed" ? "bg-gray-200 border-gray-400 text-gray-500" : "bg-gray-100 border-border-dark text-gray-600"} border text-[10px] font-bold uppercase rounded`}
               >
                 {name}
