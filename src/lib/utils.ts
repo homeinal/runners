@@ -56,10 +56,18 @@ export function formatRegistrationPeriod(
   start: Date | string | null,
   end: Date | string | null
 ): string {
-  if (!start || !end) return "기간 미정";
+  if (!start || !end) return "\uAE30\uAC04 \uBBF8\uC815";
   const startKst = toKST(start);
   const endKst = toKST(end);
-  const formatShort = (d: Date) => `${d.getMonth() + 1}월${d.getDate()}일`;
+  const formatShort = (d: Date) =>
+    `${d.getMonth() + 1}\uC6D4${d.getDate()}\uC77C`;
+  const formatWithYear = (d: Date) =>
+    `${d.getFullYear()}\uB144 ${formatShort(d)}`;
+
+  if (startKst.getFullYear() !== endKst.getFullYear()) {
+    return `${formatWithYear(startKst)} - ${formatWithYear(endKst)}`;
+  }
+
   return `${formatShort(startKst)} - ${formatShort(endKst)}`;
 }
 
