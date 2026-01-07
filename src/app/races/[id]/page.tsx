@@ -15,9 +15,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const race = await prisma.race.findUnique({
     where: { id },
     include: {
-      categories: {
-        include: { schedules: true },
-      },
+      categories: true,
     },
   });
 
@@ -41,9 +39,7 @@ export default async function RaceDetailPage({ params }: PageProps) {
   const race = await prisma.race.findUnique({
     where: { id },
     include: {
-      categories: {
-        include: { schedules: true },
-      },
+      categories: true,
     },
   });
 
@@ -56,7 +52,7 @@ export default async function RaceDetailPage({ params }: PageProps) {
     "@context": "https://schema.org",
     "@type": "SportsEvent",
     name: race.title,
-    startDate: race.eventDate.toISOString(),
+    startDate: race.eventStartAt.toISOString(),
     location: {
       "@type": "Place",
       name: race.venue || race.region,

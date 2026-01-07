@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { RaceWithCategories } from "@/types";
+import type { RaceWithCategoriesPlain } from "@/types";
+import { getRaceRegistrationStatus } from "@/lib/utils";
 
 interface Props {
-  races: RaceWithCategories[];
+  races: RaceWithCategoriesPlain[];
 }
 
 export default function AdminDashboardClient({ races }: Props) {
@@ -25,15 +26,16 @@ export default function AdminDashboardClient({ races }: Props) {
 
     const now = new Date();
     let matchesStatus = true;
+    const statusLabel = getRaceRegistrationStatus(race);
 
     if (statusFilter === "upcoming") {
-      matchesStatus = race.eventDate > now;
+      matchesStatus = race.eventStartAt > now;
     } else if (statusFilter === "past") {
-      matchesStatus = race.eventDate <= now;
+      matchesStatus = race.eventStartAt <= now;
     } else if (statusFilter === "open") {
-      matchesStatus = race.registrationStatus === "접수 중";
+      matchesStatus = statusLabel === "접수 중";
     } else if (statusFilter === "closed") {
-      matchesStatus = race.registrationStatus === "마감";
+      matchesStatus = statusLabel === "마감";
     }
 
     return matchesSearch && matchesStatus;
@@ -47,8 +49,8 @@ export default function AdminDashboardClient({ races }: Props) {
     });
   };
 
-  const getStatusBadge = (race: RaceWithCategories) => {
-    const status = race.registrationStatus;
+  const getStatusBadge = (race: RaceWithCategoriesPlain) => {
+    const status = getRaceRegistrationStatus(race);
     if (status === "접수 중") {
       return (
         <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
@@ -127,19 +129,19 @@ export default function AdminDashboardClient({ races }: Props) {
           <div className="bg-white rounded-xl shadow-sm p-4">
             <p className="text-sm text-gray-500">접수 중</p>
             <p className="text-2xl font-bold text-green-600">
-              {races.filter((r) => r.registrationStatus === "접수 중").length}
+              {races.filter((r) => getRaceRegistrationStatus(r) === "접수 중").length}
             </p>
           </div>
           <div className="bg-white rounded-xl shadow-sm p-4">
             <p className="text-sm text-gray-500">접수 예정</p>
             <p className="text-2xl font-bold text-blue-600">
-              {races.filter((r) => r.registrationStatus === "접수 예정").length}
+              {races.filter((r) => getRaceRegistrationStatus(r) === "접수 예정").length}
             </p>
           </div>
           <div className="bg-white rounded-xl shadow-sm p-4">
             <p className="text-sm text-gray-500">마감</p>
             <p className="text-2xl font-bold text-gray-600">
-              {races.filter((r) => r.registrationStatus === "마감").length}
+              {races.filter((r) => getRaceRegistrationStatus(r) === "마감").length}
             </p>
           </div>
         </div>
@@ -187,7 +189,7 @@ export default function AdminDashboardClient({ races }: Props) {
                       </div>
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-600">
-                      {formatDate(race.eventDate)}
+                      {formatDate(race.eventStartAt)}
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-600">
                       {race.region || "-"}

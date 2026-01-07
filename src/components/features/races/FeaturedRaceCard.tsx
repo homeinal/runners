@@ -7,7 +7,7 @@ interface FeaturedRaceCardProps {
 }
 
 export function FeaturedRaceCard({ race }: FeaturedRaceCardProps) {
-  const eventDate = new Date(race.eventDate);
+  const eventDate = new Date(race.eventStartAt);
   const month = eventDate.toLocaleDateString("ko-KR", { month: "long" });
   const day = eventDate.getDate();
 

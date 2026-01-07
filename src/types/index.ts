@@ -1,25 +1,31 @@
 import type {
   Race,
-  RaceCategory,
-  RaceSchedule,
-  ScheduleType,
-  CategoryStatus,
+  RaceEventCategory,
+  RegistrationStatus,
+  RaceCategoryType,
 } from "@prisma/client";
 
-// Prisma 모델 타입 re-export
-export type { Race, RaceCategory, RaceSchedule, ScheduleType, CategoryStatus };
-
-// 확장 타입 (관계 포함)
-export type RaceCategoryWithSchedules = RaceCategory & {
-  schedules: RaceSchedule[];
-};
+// Prisma model re-exports
+export type { Race, RaceEventCategory, RegistrationStatus, RaceCategoryType };
 
 export type RaceWithCategories = Race & {
-  categories: RaceCategoryWithSchedules[];
+  categories: RaceEventCategory[];
 };
 
-// 레거시 타입 (호환성 유지용)
-export type RegistrationStatus = "접수 중" | "접수 예정" | "마감" | "정보 없음";
+export type RaceEventCategoryPlain = Omit<RaceEventCategory, "distanceKm"> & {
+  distanceKm: number | null;
+};
+
+export type RaceWithCategoriesPlain = Race & {
+  categories: RaceEventCategoryPlain[];
+};
+
+// UI-friendly registration labels
+export type RegistrationStatusLabel =
+  | "접수 중"
+  | "접수 예정"
+  | "마감"
+  | "정보 없음";
 
 export type SortOption = "registration" | "date" | "popular";
 
@@ -40,7 +46,7 @@ export interface PaginatedRaces {
   hasMore: boolean;
 }
 
-// 유틸리티 타입
+// Utility types
 export interface FeeStructure {
   default?: number;
   options?: Array<{

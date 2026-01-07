@@ -1,11 +1,11 @@
 import Link from "next/link";
-import type { RaceWithCategories } from "@/types";
+import type { RaceWithCategories, RaceWithCategoriesPlain } from "@/types";
 import { getRaceCategoryNames, getRaceRegistrationPeriod } from "@/lib/utils";
 
 type ScheduleStatus = "closed" | "open" | "upcoming";
 
 interface ScheduleCardProps {
-  race: RaceWithCategories;
+  race: RaceWithCategories | RaceWithCategoriesPlain;
   status: ScheduleStatus;
   time?: string;
   showTopPick?: boolean;
@@ -61,7 +61,7 @@ export function ScheduleCard({
   const config = getStatusConfig(status);
   const categoryNames = getRaceCategoryNames(race);
   const { start: regStart } = getRaceRegistrationPeriod(race);
-  const eventDate = new Date(race.eventDate);
+  const eventDate = new Date(race.eventStartAt);
 
   const formatEventDate = () => {
     const month = String(eventDate.getMonth() + 1).padStart(2, "0");

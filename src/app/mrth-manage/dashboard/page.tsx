@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { serializeRacesForClient } from "@/lib/serialize";
 import AdminDashboardClient from "./AdminDashboardClient";
 
 async function checkAuth() {
@@ -17,13 +18,13 @@ export default async function AdminDashboardPage() {
   }
 
   const races = await prisma.race.findMany({
-    orderBy: { eventDate: "asc" },
+    orderBy: { eventStartAt: "asc" },
     include: {
-      categories: {
-        include: { schedules: true },
-      },
+      categories: true,
     },
   });
 
-  return <AdminDashboardClient races={races} />;
+  const racesForClient = serializeRacesForClient(races);
+
+  return <AdminDashboardClient races={racesForClient} />;
 }

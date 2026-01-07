@@ -2,7 +2,8 @@ import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import { Header } from "@/components/layout";
 import { WheelList } from "@/components/features/urgent/WheelList";
-import type { RaceWithCategories } from "@/types";
+import type { RaceWithCategoriesPlain } from "@/types";
+import { serializeRacesForClient } from "@/lib/serialize";
 import {
   todayKST,
   startOfDayKST,
@@ -47,43 +48,43 @@ export default async function UrgentPage({ searchParams }: UrgentPageProps) {
   // 카테고리 REGISTRATION 스케줄 기준으로 이번 주 접수 시작 대회 조회 (레거시 보조)
   const races = await prisma.race.findMany({
     where: {
-      OR: [
-        {
-          categories: {
-            some: {
-              schedules: {
-                some: {
-                  type: "REGISTRATION",
-                  startAt: {
-                    gte: weekStart,
-                    lte: weekEnd,
-                  },
-                },
-              },
-            },
-          },
-        },
-        {
-          registrationStart: {
-            gte: weekStart,
-            lte: weekEnd,
-          },
-        },
-      ],
-    },
-    orderBy: [{ eventDate: "asc" }],
-    include: {
-      categories: {
-        include: { schedules: true },
+      registrationStartAt: {
+        gte: weekStart,
+        lte: weekEnd,
       },
     },
+    orderBy: [{ eventStartAt: "asc" }],
+    include: {
+      categories: true,
+    },
   });
+  const racesForClient = serializeRacesForClient(races);
 
   const now = nowKST();
 
+  function determineRaceStatusLegacy(
+    race: any
+  ): "closed" | "open" | "upcoming" {
+    const { start: regStartRaw, end: regEndRaw } = getRaceRegistrationPeriod(
+      race
+    );
+    const regStart = regStartRaw ? toKST(regStartRaw) : null;
+    const regEnd = regEndRaw ? toKST(regEndRaw) : null;
+
+    if (!regStart && !regEnd) {
+      if (race.registrationStatus === "open") return "open";
+      if (race.registrationStatus === "closed") return "closed";
+      return "upcoming";
+    }
+
+    if (regEnd && isAfter(now, regEnd)) return "closed";
+    if (regStart && isBefore(now, regStart)) return "upcoming";
+    return "open";
+  }
+
   // 상태 결정 함수: RaceCategory.status 우선, 그 다음 스케줄 기반
   function determineRaceStatus(
-    race: RaceWithCategories
+    race: RaceWithCategoriesPlain
   ): "closed" | "open" | "upcoming" {
     // 1순위: RaceCategory.status가 CLOSED면 무조건 마감
     if (race.categories && race.categories.length > 0) {
@@ -133,12 +134,12 @@ export default async function UrgentPage({ searchParams }: UrgentPageProps) {
   // 날짜별로 그룹화: 접수시작일이 그 날인 대회만
   const dayGroups = weekDates.map((date) => {
     const racesForDay: Array<{
-      race: RaceWithCategories;
+      race: RaceWithCategoriesPlain;
       status: "closed" | "open" | "upcoming";
       time?: string;
     }> = [];
 
-    races.forEach((race) => {
+    racesForClient.forEach((race) => {
       const { start: regStart } = getRaceRegistrationPeriod(race);
       if (!regStart) return;
 

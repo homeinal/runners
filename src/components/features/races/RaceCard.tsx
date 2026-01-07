@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { RaceWithCategories } from "@/types";
-import { formatDayMonth, getRaceRegistrationStatus } from "@/lib/utils";
+import { formatDayMonth, getRaceRegistrationStatus, getRaceCategoryNames } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 
 interface RaceCardProps {
@@ -8,15 +8,9 @@ interface RaceCardProps {
 }
 
 export function RaceCard({ race }: RaceCardProps) {
-  const { day, month } = formatDayMonth(race.eventDate);
+  const { day, month } = formatDayMonth(race.eventStartAt);
   const registrationStatus = getRaceRegistrationStatus(race);
-  const categoryNames = Array.from(
-    new Set(
-      (race.categories || []).map(
-        (c) => c.normalizedName || c.name
-      )
-    )
-  );
+  const categoryNames = Array.from(new Set(getRaceCategoryNames(race)));
   const displayed = categoryNames.slice(0, 3);
   const overflow = categoryNames.length - displayed.length;
 

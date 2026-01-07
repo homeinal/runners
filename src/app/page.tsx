@@ -28,7 +28,7 @@ async function getRegions() {
     by: ['region'],
     where: {
       region: { not: null },
-      eventDate: { gte: new Date() } // Future races only
+      eventStartAt: { gte: new Date() } // Future races only
     },
     _count: { region: true },
     orderBy: { _count: { region: 'desc' } }
@@ -47,7 +47,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   // Build where clause
   const where: Record<string, any> = {
-    eventDate: { gte: new Date() },
+    eventStartAt: { gte: new Date() },
   };
 
   if (region && region !== "전체") {
@@ -62,29 +62,39 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     
     if (distance === "full") {
       distanceConditions.push(
-        { name: { contains: "Full", mode: "insensitive" } },
-        { name: { contains: "풀", mode: "insensitive" } },
-        { name: { contains: "42.195", mode: "insensitive" } }
+        { distanceKm: { gte: 41, lte: 43 } },
+        { rawName: { contains: "Full", mode: "insensitive" } },
+        { canonicalName: { contains: "Full", mode: "insensitive" } },
+        { rawName: { contains: "풀", mode: "insensitive" } },
+        { rawName: { contains: "42.195", mode: "insensitive" } }
       );
     } else if (distance === "half") {
       distanceConditions.push(
-        { name: { contains: "Half", mode: "insensitive" } },
-        { name: { contains: "하프", mode: "insensitive" } },
-        { name: { contains: "21.0975", mode: "insensitive" } }
+        { distanceKm: { gte: 20, lte: 22 } },
+        { rawName: { contains: "Half", mode: "insensitive" } },
+        { canonicalName: { contains: "Half", mode: "insensitive" } },
+        { rawName: { contains: "하프", mode: "insensitive" } },
+        { rawName: { contains: "21.0975", mode: "insensitive" } }
       );
     } else if (distance === "10km") {
        distanceConditions.push(
-        { name: { contains: "10km", mode: "insensitive" } },
-        { name: { contains: "10k", mode: "insensitive" } },
+        { distanceKm: { gte: 9, lte: 11 } },
+        { rawName: { contains: "10km", mode: "insensitive" } },
+        { canonicalName: { contains: "10km", mode: "insensitive" } },
+        { rawName: { contains: "10k", mode: "insensitive" } },
+        { canonicalName: { contains: "10k", mode: "insensitive" } },
         // 10km 제외한 10km 미만 키워드가 포함되지 않도록 주의해야 하지만, 
         // 보통 "10km"가 명시되므로 contains로 충분
       );
     } else if (distance === "5km") { // 10km 미만
        distanceConditions.push(
-        { name: { contains: "5km", mode: "insensitive" } },
-        { name: { contains: "5k", mode: "insensitive" } },
-        { name: { contains: "3km", mode: "insensitive" } },
-        { name: { contains: "걷기", mode: "insensitive" } }
+        { distanceKm: { gt: 0, lt: 10 } },
+        { rawName: { contains: "5km", mode: "insensitive" } },
+        { canonicalName: { contains: "5km", mode: "insensitive" } },
+        { rawName: { contains: "5k", mode: "insensitive" } },
+        { canonicalName: { contains: "5k", mode: "insensitive" } },
+        { rawName: { contains: "3km", mode: "insensitive" } },
+        { rawName: { contains: "걷기", mode: "insensitive" } }
       );
     }
 
@@ -110,11 +120,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const [racesRaw, regions] = await Promise.all([
     prisma.race.findMany({
       where,
-      orderBy: { eventDate: "asc" },
+      orderBy: { eventStartAt: "asc" },
       include: {
-        categories: {
-          include: { schedules: true },
-        },
+        categories: true,
       },
     }),
     getRegions(),
@@ -125,17 +133,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   function deriveRegistrationWindow(race: any) {
     const starts: Date[] = [];
     const ends: Date[] = [];
-    race.categories?.forEach((cat: any) => {
-      cat.schedules
-        ?.filter((s: any) => s.type === "REGISTRATION")
-        .forEach((s: any) => {
-          if (s.startAt) starts.push(new Date(s.startAt));
-          if (s.endAt) ends.push(new Date(s.endAt));
-        });
-    });
+    if (race.registrationStartAt) starts.push(new Date(race.registrationStartAt));
+    if (race.registrationEndAt) ends.push(new Date(race.registrationEndAt));
     // 미래/진행 중 우선: 미래 start가 있으면 그 중 최소, 없으면 진행 중이면 현재로 보정
-    const legacyStart = race.registrationStart ? new Date(race.registrationStart) : null;
-    const legacyEnd = race.registrationEnd ? new Date(race.registrationEnd) : null;
+    const legacyStart = race.registrationStartAt ? new Date(race.registrationStartAt) : null;
+    const legacyEnd = race.registrationEndAt ? new Date(race.registrationEndAt) : null;
 
     const futureStarts = starts.filter((d) => d.getTime() >= now.getTime());
     const minFutureStart =
@@ -206,7 +208,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const filteredByStatus = racesRaw.filter((race) => {
     if (status === "전체" || !status) return true;
     const { start, end } = deriveRegistrationWindow(race);
-    if (!start && !end) return false;
+    if (!start && !end) {
+      if (race.registrationStatus === "open") return status === "open";
+      if (race.registrationStatus === "closed") return status === "closed";
+      return false;
+    }
     if (status === "upcoming") return !!start && start > now;
     if (status === "open") return (!!start ? start <= now : true) && (!!end ? end >= now : true);
     if (status === "closed") return !!end && end < now;
@@ -221,7 +227,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     } else if (sort === "popular") {
       if (a.isFeatured !== b.isFeatured) return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
     }
-    return new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime();
+    return new Date(a.eventStartAt).getTime() - new Date(b.eventStartAt).getTime();
   });
 
   const total = sorted.length;
@@ -237,13 +243,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     featuredRace = await prisma.race.findFirst({
       where: {
         OR: [{ isFeatured: true }, { isUrgent: true }],
-        eventDate: { gte: new Date() },
+        eventStartAt: { gte: new Date() },
       },
-      orderBy: { eventDate: "asc" },
+      orderBy: { eventStartAt: "asc" },
       include: {
-        categories: {
-          include: { schedules: true },
-        },
+        categories: true,
       },
     });
   }
@@ -254,13 +258,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     <>
       <Header />
       <main className="flex-1 w-full max-w-[900px] mx-auto px-4 py-10 flex flex-col gap-8">
+        {/* Featured Race - 헤더 바로 아래 배치 */}
+        {featuredRace && <FeaturedRaceCard race={featuredRace} />}
+
         {/* Filter Section */}
         <Suspense fallback={<div className="h-32" />}>
           <FilterSection regions={regions} />
         </Suspense>
-
-        {/* Featured Race */}
-        {featuredRace && <FeaturedRaceCard race={featuredRace} />}
 
         {/* Section Divider */}
         <div className="flex items-center gap-4 py-2">

@@ -23,9 +23,7 @@ export async function GET(request: NextRequest, { params }: Props) {
   const race = await prisma.race.findUnique({
     where: { id },
     include: {
-      categories: {
-        include: { schedules: true },
-      },
+      categories: true,
     },
   });
 
@@ -52,50 +50,46 @@ export async function PUT(request: NextRequest, { params }: Props) {
       where: { id },
       data: {
         title: data.title,
-        eventDate: data.eventDate ? new Date(data.eventDate) : undefined,
+        eventStartAt: data.eventStartAt ? new Date(data.eventStartAt) : undefined,
+        eventTimezone: data.eventTimezone || "Asia/Seoul",
+        eventTimeRaw: data.eventTimeRaw || null,
+        country: data.country || "Unknown",
         region: data.region || null,
         venue: data.venue || null,
-        organizer: data.organizer || null,
+        organizer: data.organizer || "Unknown",
+        organizerRep: data.organizerRep || null,
         website: data.website || null,
-        registrationStatus: data.registrationStatus || null,
-        registrationStart: data.registrationStart
-          ? new Date(data.registrationStart)
+        registrationStatus: data.registrationStatus || "unknown",
+        registrationStartAt: data.registrationStartAt
+          ? new Date(data.registrationStartAt)
           : null,
-        registrationEnd: data.registrationEnd
-          ? new Date(data.registrationEnd)
+        registrationEndAt: data.registrationEndAt
+          ? new Date(data.registrationEndAt)
           : null,
+        categoriesRaw: Array.isArray(data.categoriesRaw) ? data.categoriesRaw : [],
         isFeatured: data.isFeatured ?? false,
         isUrgent: data.isUrgent ?? false,
-        generalGuide: data.generalGuide || null,
         phone: data.phone || null,
         email: data.email || null,
+        imageUrl: data.imageUrl || null,
+        sourceUrl: data.sourceUrl || null,
       },
     });
 
     // Update categories
     if (data.categories && Array.isArray(data.categories)) {
       for (const category of data.categories) {
-        await prisma.raceCategory.update({
+        const distanceValue = Number(category.distanceKm);
+        await prisma.raceEventCategory.update({
           where: { id: category.id },
           data: {
-            name: category.name,
-            status: category.status,
-            startTime: category.startTime || null,
+            rawName: category.rawName,
+            canonicalName: category.canonicalName,
+            distanceKm: Number.isFinite(distanceValue) ? distanceValue : null,
+            type: category.type,
+            tags: Array.isArray(category.tags) ? category.tags : [],
           },
         });
-
-        // Update schedules
-        if (category.schedules && Array.isArray(category.schedules)) {
-          for (const schedule of category.schedules) {
-            await prisma.raceSchedule.update({
-              where: { id: schedule.id },
-              data: {
-                startAt: schedule.startAt ? new Date(schedule.startAt) : null,
-                endAt: schedule.endAt ? new Date(schedule.endAt) : null,
-              },
-            });
-          }
-        }
       }
     }
 
@@ -103,9 +97,7 @@ export async function PUT(request: NextRequest, { params }: Props) {
     const updatedRace = await prisma.race.findUnique({
       where: { id },
       include: {
-        categories: {
-          include: { schedules: true },
-        },
+        categories: true,
       },
     });
 

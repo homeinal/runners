@@ -6,6 +6,7 @@ import {
   getRaceCategoryNames,
   getRaceRegistrationPeriod,
 } from "@/lib/utils";
+import { formatTime } from "@/lib/date";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 
@@ -14,10 +15,12 @@ interface RaceDetailProps {
 }
 
 export function RaceDetail({ race }: RaceDetailProps) {
-  const eventDate = new Date(race.eventDate);
+  const eventDate = new Date(race.eventStartAt);
   const registrationStatus = getRaceRegistrationStatus(race);
   const categoryNames = getRaceCategoryNames(race);
   const { start: regStart, end: regEnd } = getRaceRegistrationPeriod(race);
+  const eventTimeLabel =
+    race.eventTimeRaw || (race.eventStartAt ? formatTime(race.eventStartAt) : null);
 
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -50,7 +53,7 @@ export function RaceDetail({ race }: RaceDetailProps) {
             <div className="flex flex-col leading-none">
               <span className="font-bold text-lg">{formatDate(eventDate)}</span>
               <span className="text-sm font-medium uppercase text-gray-600">
-                {race.eventTime || "시간 미정"}
+                {eventTimeLabel || "시간 미정"}
               </span>
             </div>
           </div>

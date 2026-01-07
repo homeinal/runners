@@ -2,23 +2,33 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { RaceWithCategories, CategoryStatus } from "@/types";
+import type {
+  RaceWithCategoriesPlain,
+  RaceCategoryType,
+  RegistrationStatus,
+} from "@/types";
 
 interface Props {
-  race: RaceWithCategories;
+  race: RaceWithCategoriesPlain;
 }
 
-const STATUS_OPTIONS: { value: CategoryStatus; label: string }[] = [
-  { value: "UPCOMING", label: "접수 예정" },
-  { value: "OPEN", label: "접수 중" },
-  { value: "CLOSED", label: "마감" },
-  { value: "CANCELLED", label: "취소" },
+const CATEGORY_TYPE_OPTIONS: { value: RaceCategoryType; label: string }[] = [
+  { value: "event", label: "Event" },
+  { value: "walk", label: "Walk" },
+  { value: "team", label: "Team" },
+  { value: "para", label: "Para" },
+  { value: "trail", label: "Trail" },
+  { value: "race", label: "Race" },
+  { value: "other", label: "Other" },
 ];
 
-const REGISTRATION_STATUS_OPTIONS = [
-  { value: "접수 중", label: "접수 중" },
-  { value: "접수 예정", label: "접수 예정" },
-  { value: "마감", label: "마감" },
+const REGISTRATION_STATUS_OPTIONS: {
+  value: RegistrationStatus;
+  label: string;
+}[] = [
+  { value: "open", label: "접수 중" },
+  { value: "closed", label: "마감" },
+  { value: "unknown", label: "정보 없음" },
 ];
 
 export default function RaceEditClient({ race: initialRace }: Props) {
@@ -30,14 +40,9 @@ export default function RaceEditClient({ race: initialRace }: Props) {
   } | null>(null);
   const router = useRouter();
 
-  const formatDateForInput = (date: Date | null | undefined) => {
+  const formatDateForInput = (date: Date | string | null | undefined) => {
     if (!date) return "";
     return new Date(date).toISOString().slice(0, 16);
-  };
-
-  const formatDateOnly = (date: Date | null | undefined) => {
-    if (!date) return "";
-    return new Date(date).toISOString().slice(0, 10);
   };
 
   const handleRaceChange = (
@@ -50,7 +55,7 @@ export default function RaceEditClient({ race: initialRace }: Props) {
   const handleCategoryChange = (
     categoryId: string,
     field: string,
-    value: string | CategoryStatus
+    value: string | string[] | number | null
   ) => {
     setRace((prev) => ({
       ...prev,
@@ -60,27 +65,12 @@ export default function RaceEditClient({ race: initialRace }: Props) {
     }));
   };
 
-  const handleScheduleChange = (
-    categoryId: string,
-    scheduleId: string,
-    field: string,
-    value: string | null
-  ) => {
-    setRace((prev) => ({
-      ...prev,
-      categories: prev.categories.map((cat) =>
-        cat.id === categoryId
-          ? {
-              ...cat,
-              schedules: cat.schedules.map((sch) =>
-                sch.id === scheduleId
-                  ? { ...sch, [field]: value ? new Date(value) : null }
-                  : sch
-              ),
-            }
-          : cat
-      ),
-    }));
+  const handleCategoryTagsChange = (categoryId: string, value: string) => {
+    const tags = value
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+    handleCategoryChange(categoryId, "tags", tags);
   };
 
   const handleSave = async () => {
@@ -173,17 +163,51 @@ export default function RaceEditClient({ race: initialRace }: Props) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                대회일
+                시작 일시
               </label>
               <input
-                type="date"
-                value={formatDateOnly(race.eventDate)}
+                type="datetime-local"
+                value={formatDateForInput(race.eventStartAt)}
                 onChange={(e) =>
                   handleRaceChange(
-                    "eventDate",
+                    "eventStartAt",
                     e.target.value ? new Date(e.target.value) : null
                   )
                 }
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                표시용 시간
+              </label>
+              <input
+                type="text"
+                value={race.eventTimeRaw || ""}
+                onChange={(e) => handleRaceChange("eventTimeRaw", e.target.value)}
+                placeholder="예: 09:00"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                타임존
+              </label>
+              <input
+                type="text"
+                value={race.eventTimezone || ""}
+                onChange={(e) => handleRaceChange("eventTimezone", e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                국가
+              </label>
+              <input
+                type="text"
+                value={race.country || ""}
+                onChange={(e) => handleRaceChange("country", e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
               />
             </div>
@@ -222,7 +246,18 @@ export default function RaceEditClient({ race: initialRace }: Props) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                웹사이트
+                주최 담당자
+              </label>
+              <input
+                type="text"
+                value={race.organizerRep || ""}
+                onChange={(e) => handleRaceChange("organizerRep", e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                홈페이지
               </label>
               <input
                 type="url"
@@ -231,27 +266,46 @@ export default function RaceEditClient({ race: initialRace }: Props) {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                원문 URL
+              </label>
+              <input
+                type="url"
+                value={race.sourceUrl || ""}
+                onChange={(e) => handleRaceChange("sourceUrl", e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                이미지 URL
+              </label>
+              <input
+                type="url"
+                value={race.imageUrl || ""}
+                onChange={(e) => handleRaceChange("imageUrl", e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
+              />
+            </div>
           </div>
         </section>
 
-        {/* Registration Status (Legacy) */}
+        {/* Registration */}
         <section className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">
-            접수 상태 (레거시)
-          </h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-4">접수 정보</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 접수 상태
               </label>
               <select
-                value={race.registrationStatus || ""}
+                value={race.registrationStatus || "unknown"}
                 onChange={(e) =>
                   handleRaceChange("registrationStatus", e.target.value)
                 }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
               >
-                <option value="">선택</option>
                 {REGISTRATION_STATUS_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
@@ -265,10 +319,10 @@ export default function RaceEditClient({ race: initialRace }: Props) {
               </label>
               <input
                 type="datetime-local"
-                value={formatDateForInput(race.registrationStart)}
+                value={formatDateForInput(race.registrationStartAt)}
                 onChange={(e) =>
                   handleRaceChange(
-                    "registrationStart",
+                    "registrationStartAt",
                     e.target.value ? new Date(e.target.value) : null
                   )
                 }
@@ -281,10 +335,10 @@ export default function RaceEditClient({ race: initialRace }: Props) {
               </label>
               <input
                 type="datetime-local"
-                value={formatDateForInput(race.registrationEnd)}
+                value={formatDateForInput(race.registrationEndAt)}
                 onChange={(e) =>
                   handleRaceChange(
-                    "registrationEnd",
+                    "registrationEndAt",
                     e.target.value ? new Date(e.target.value) : null
                   )
                 }
@@ -297,9 +351,7 @@ export default function RaceEditClient({ race: initialRace }: Props) {
               <input
                 type="checkbox"
                 checked={race.isFeatured}
-                onChange={(e) =>
-                  handleRaceChange("isFeatured", e.target.checked)
-                }
+                onChange={(e) => handleRaceChange("isFeatured", e.target.checked)}
                 className="w-5 h-5 rounded border-gray-300 text-black focus:ring-black"
               />
               <span className="text-sm text-gray-700">추천 대회</span>
@@ -322,145 +374,114 @@ export default function RaceEditClient({ race: initialRace }: Props) {
             종목 ({race.categories.length}개)
           </h2>
           <div className="space-y-6">
-            {race.categories.map((category, idx) => (
-              <div
-                key={category.id}
-                className="border border-gray-200 rounded-lg p-4"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-medium text-gray-900">
-                    종목 {idx + 1}: {category.name}
-                  </h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      종목명
-                    </label>
-                    <input
-                      type="text"
-                      value={category.name}
-                      onChange={(e) =>
-                        handleCategoryChange(category.id, "name", e.target.value)
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      상태
-                    </label>
-                    <select
-                      value={category.status}
-                      onChange={(e) =>
-                        handleCategoryChange(
-                          category.id,
-                          "status",
-                          e.target.value as CategoryStatus
-                        )
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
-                    >
-                      {STATUS_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      출발 시간
-                    </label>
-                    <input
-                      type="text"
-                      value={category.startTime || ""}
-                      onChange={(e) =>
-                        handleCategoryChange(
-                          category.id,
-                          "startTime",
-                          e.target.value
-                        )
-                      }
-                      placeholder="HH:mm"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
-                    />
-                  </div>
-                </div>
+            {race.categories.map((category, idx) => {
+              const distanceValue =
+                category.distanceKm === null || category.distanceKm === undefined
+                  ? ""
+                  : category.distanceKm.toString();
 
-                {/* Schedules */}
-                {category.schedules.length > 0 && (
-                  <div className="mt-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">
-                      일정
-                    </h4>
-                    <div className="space-y-2">
-                      {category.schedules.map((schedule) => (
-                        <div
-                          key={schedule.id}
-                          className="grid grid-cols-1 md:grid-cols-4 gap-2 p-3 bg-gray-50 rounded-lg"
-                        >
-                          <div className="flex items-center">
-                            <span
-                              className={`px-2 py-1 rounded text-xs font-medium ${
-                                schedule.type === "REGISTRATION"
-                                  ? "bg-blue-100 text-blue-800"
-                                  : "bg-green-100 text-green-800"
-                              }`}
-                            >
-                              {schedule.type === "REGISTRATION"
-                                ? "접수"
-                                : "결제"}
-                            </span>
-                            {schedule.label && (
-                              <span className="ml-2 text-sm text-gray-600">
-                                ({schedule.label})
-                              </span>
-                            )}
-                          </div>
-                          <div>
-                            <label className="block text-xs text-gray-500 mb-1">
-                              시작
-                            </label>
-                            <input
-                              type="datetime-local"
-                              value={formatDateForInput(schedule.startAt)}
-                              onChange={(e) =>
-                                handleScheduleChange(
-                                  category.id,
-                                  schedule.id,
-                                  "startAt",
-                                  e.target.value || null
-                                )
-                              }
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm text-gray-900"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs text-gray-500 mb-1">
-                              종료
-                            </label>
-                            <input
-                              type="datetime-local"
-                              value={formatDateForInput(schedule.endAt)}
-                              onChange={(e) =>
-                                handleScheduleChange(
-                                  category.id,
-                                  schedule.id,
-                                  "endAt",
-                                  e.target.value || null
-                                )
-                              }
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm text-gray-900"
-                            />
-                          </div>
-                        </div>
-                      ))}
+              return (
+                <div
+                  key={category.id}
+                  className="border border-gray-200 rounded-lg p-4"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-medium text-gray-900">
+                      종목 {idx + 1}: {category.rawName}
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        원본 명칭
+                      </label>
+                      <input
+                        type="text"
+                        value={category.rawName}
+                        onChange={(e) =>
+                          handleCategoryChange(
+                            category.id,
+                            "rawName",
+                            e.target.value
+                          )
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        표준 명칭
+                      </label>
+                      <input
+                        type="text"
+                        value={category.canonicalName}
+                        onChange={(e) =>
+                          handleCategoryChange(
+                            category.id,
+                            "canonicalName",
+                            e.target.value
+                          )
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        타입
+                      </label>
+                      <select
+                        value={category.type}
+                        onChange={(e) =>
+                          handleCategoryChange(
+                            category.id,
+                            "type",
+                            e.target.value as RaceCategoryType
+                          )
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
+                      >
+                        {CATEGORY_TYPE_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        거리 (km)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={distanceValue}
+                        onChange={(e) =>
+                          handleCategoryChange(
+                            category.id,
+                            "distanceKm",
+                            e.target.value
+                          )
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        태그 (쉼표로 구분)
+                      </label>
+                      <input
+                        type="text"
+                        value={(category.tags || []).join(", ")}
+                        onChange={(e) =>
+                          handleCategoryTagsChange(category.id, e.target.value)
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
+                      />
                     </div>
                   </div>
-                )}
-              </div>
-            ))}
+                </div>
+              );
+            })}
 
             {race.categories.length === 0 && (
               <p className="text-center py-8 text-gray-500">
@@ -470,44 +491,31 @@ export default function RaceEditClient({ race: initialRace }: Props) {
           </div>
         </section>
 
-        {/* Additional Info */}
+        {/* Contact */}
         <section className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">추가 정보</h2>
-          <div className="space-y-4">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">연락처</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                공통 안내사항
+                전화번호
               </label>
-              <textarea
-                value={race.generalGuide || ""}
-                onChange={(e) => handleRaceChange("generalGuide", e.target.value)}
-                rows={4}
+              <input
+                type="text"
+                value={race.phone || ""}
+                onChange={(e) => handleRaceChange("phone", e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  연락처
-                </label>
-                <input
-                  type="text"
-                  value={race.phone || ""}
-                  onChange={(e) => handleRaceChange("phone", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  이메일
-                </label>
-                <input
-                  type="email"
-                  value={race.email || ""}
-                  onChange={(e) => handleRaceChange("email", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                이메일
+              </label>
+              <input
+                type="email"
+                value={race.email || ""}
+                onChange={(e) => handleRaceChange("email", e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
+              />
             </div>
           </div>
         </section>

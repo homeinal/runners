@@ -77,39 +77,38 @@ export default async function WeeklyPage({ searchParams }: WeeklyPageProps) {
   // 카테고리 REGISTRATION 스케줄을 기준으로 범위 내 대회 조회 (레거시 필드는 보조)
   const races = await prisma.race.findMany({
     where: {
-      OR: [
-        {
-          categories: {
-            some: {
-              schedules: {
-                some: {
-                  type: "REGISTRATION",
-                  startAt: {
-                    gte: dateRangeStart,
-                    lte: dateRangeEnd,
-                  },
-                },
-              },
-            },
-          },
-        },
-        {
-          registrationStart: {
-            gte: dateRangeStart,
-            lte: dateRangeEnd,
-          },
-        },
-      ],
-    },
-    orderBy: [{ eventDate: "asc" }],
-    include: {
-      categories: {
-        include: { schedules: true },
+      registrationStartAt: {
+        gte: dateRangeStart,
+        lte: dateRangeEnd,
       },
+    },
+    orderBy: [{ eventStartAt: "asc" }],
+    include: {
+      categories: true,
     },
   });
 
   const now = nowKST();
+
+  function determineRaceStatusLegacy(
+    race: any
+  ): "closed" | "open" | "upcoming" {
+    const { start: regStartRaw, end: regEndRaw } = getRaceRegistrationPeriod(
+      race
+    );
+    const regStart = regStartRaw ? toKST(regStartRaw) : null;
+    const regEnd = regEndRaw ? toKST(regEndRaw) : null;
+
+    if (!regStart && !regEnd) {
+      if (race.registrationStatus === "open") return "open";
+      if (race.registrationStatus === "closed") return "closed";
+      return "upcoming";
+    }
+
+    if (regEnd && isAfter(now, regEnd)) return "closed";
+    if (regStart && isBefore(now, regStart)) return "upcoming";
+    return "open";
+  }
 
   // 상태 결정 함수: RaceCategory.status 우선, 그 다음 스케줄 기반
   function determineRaceStatus(

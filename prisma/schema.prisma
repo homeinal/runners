@@ -8,130 +8,96 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-/// 대회 공통 일정 및 접수 유형 구분
-enum ScheduleType {
-  REGISTRATION // 접수 일정
-  PAYMENT      // 결제 일정
+// Registration status
+enum RegistrationStatus {
+  open
+  closed
+  unknown
 }
 
-/// 종목별 현재 상태 (스케줄보다 우선순위 높음 - 수동 마감용)
-enum CategoryStatus {
-  UPCOMING  // 접수 예정
-  OPEN      // 접수 중
-  CLOSED    // 마감 (조기 마감 포함)
-  CANCELLED // 취소
+// Race category type
+enum RaceCategoryType {
+  event
+  walk
+  team
+  para
+  trail
+  race
+  other
 }
 
 model Race {
-  id        String @id @default(cuid())
-  title     String
+  id    String @id @default(uuid()) @db.Uuid
+  title String
 
   // Source
-  sourceUrl String? @unique @map("source_url") // 크롤링 원본 URL
+  sourceUrl String? @unique @map("source_url")
 
   // Date & Time
-  eventDate DateTime @map("event_date")
-  eventTime String?  @map("event_time") // TODO: 나중에 제거 (RaceCategory.startTime으로 이동)
+  eventStartAt DateTime @map("event_start_at") @db.Timestamptz(6)
+  eventTimezone String @default("Asia/Seoul") @map("event_timezone")
+  eventTimeRaw String? @map("event_time_raw")
 
   // Location
   country String
   region  String?
   venue   String?
 
-  // === 레거시 필드 (마이그레이션 후 제거 예정) ===
-  registrationStatus   String?   @map("registration_status") // "접수 중", "접수 예정", "마감"
-  registrationStart    DateTime? @map("registration_start")
-  registrationEnd      DateTime? @map("registration_end")
-  legacyCategories     String[] @map("categories") // 기존 categories 필드 유지
-  isUrgent             Boolean   @default(false) @map("is_urgent") // 24시간 내 마감
-  // === 레거시 필드 끝 ===
+  // Registration
+  registrationStatus RegistrationStatus @default(unknown) @map("registration_status")
+  registrationStartAt DateTime? @map("registration_start_at") @db.Timestamptz(6)
+  registrationEndAt DateTime? @map("registration_end_at") @db.Timestamptz(6)
 
-  // Event Info
-  organizer    String?
-  organizerRep String? @map("organizer_rep") // 대표자
+  // Raw category cache
+  categoriesRaw String[] @map("categories_raw")
+
+  // Organizer
+  organizer    String
+  organizerRep String? @map("organizer_rep")
 
   // Contact
   phone   String?
   email   String?
   website String?
 
-  // Images & Guide
-  imageUrl     String? @map("image_url")
-  generalGuide String? @map("general_guide") @db.Text // 공통 기타 안내
+  // Images
+  imageUrl String? @map("image_url")
 
   // Features
   isFeatured Boolean @default(false) @map("is_featured")
+  isUrgent   Boolean @default(false) @map("is_urgent")
 
   // Metadata
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  // 관계 설정 (새 구조)
-  categories RaceCategory[]
+  // Relations
+  categories RaceEventCategory[]
 
-  @@index([eventDate])
-  @@index([country])
-  @@index([region])
+  @@index([eventStartAt])
+  @@index([country, region, eventStartAt])
+  @@index([registrationStatus])
+  @@index([createdAt])
   @@index([isFeatured])
+  @@index([isUrgent])
   @@map("races")
 }
 
-model RaceCategory {
-  id     String @id @default(cuid())
-  raceId String @map("race_id")
+model RaceEventCategory {
+  id     String @id @default(uuid()) @db.Uuid
+  raceId String @map("race_id") @db.Uuid
   race   Race   @relation(fields: [raceId], references: [id], onDelete: Cascade)
 
-  // 종목 기본 정보
-  name String @map("name") // 종목/부문명 (예: 10km, Half)
-  // 정규화된 종목명/매핑
-  canonicalId   String? @map("canonical_id")
-  normalizedName String? @map("normalized_name")
+  rawName       String @map("raw_name")
+  canonicalName String @map("canonical_name")
+  distanceKm    Decimal? @map("distance_km")
+  type          RaceCategoryType
+  tags          String[] @default([]) @map("tags")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  // [핵심 변경] 참가비: 복잡한 할인/조건을 모두 수용하는 JSON 구조
-  // 예: { "default": 40000, "options": [{ "label": "청소년", "price": 30000 }] }
-  fee Json? @map("fee")
-
-  qualification String? @map("qualification") @db.Text // 참가자격
-  startTime     String? @map("start_time") // 출발시간 (HH:mm)
-  notes         String? @map("notes") @db.Text // 종목별 개별 안내
-
-  // 상태 관리 (3분 컷 마감 대응용)
-  status CategoryStatus @default(UPCOMING) @map("status")
-
-  // 성능 최적화 캐시 (홈 화면의 '24시간 내 오픈' 조회용)
-  nextRegistrationAt    DateTime? @map("next_registration_at")
-  nextRegistrationEndAt DateTime? @map("next_registration_end_at")
-  nextPaymentAt         DateTime? @map("next_payment_at")
-  nextPaymentEndAt      DateTime? @map("next_payment_end_at")
-
-  // 메타데이터
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  // 관계 설정
-  schedules RaceSchedule[]
-
+  @@unique([raceId, rawName])
   @@index([raceId])
-  @@index([status])
-  @@index([nextRegistrationAt])
-  @@map("race_categories")
-}
-
-model RaceSchedule {
-  id         String       @id @default(cuid())
-  categoryId String       @map("category_id")
-  category   RaceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  type    ScheduleType @map("type")
-  startAt DateTime?    @map("start_at") // 시작 일시
-  endAt   DateTime?    @map("end_at") // 마감 일시
-  label   String?      @map("label") // 단계 구분 (1차, 2차, 추가 등)
-
-  // 메타데이터
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@index([categoryId, type])
-  @@index([startAt, endAt])
-  @@map("race_schedules")
+  @@index([type])
+  @@index([distanceKm])
+  @@map("race_event_categories")
 }

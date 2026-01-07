@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { RaceWithCategories } from "@/types";
+import type { RaceWithCategoriesPlain } from "@/types";
 import { ScheduleCard } from "@/components/features/schedule/ScheduleCard";
 import { getDateParts } from "@/lib/date";
 
 interface DayGroup {
   date: string | null; // ISO string (Server에서 직렬화됨)
   races: Array<{
-    race: RaceWithCategories;
+    race: RaceWithCategoriesPlain;
     status: "closed" | "open" | "upcoming";
     time?: string;
   }>;
@@ -25,7 +25,7 @@ interface WheelListProps {
 // Helper to group races by time
 function groupRacesByTime(
   races: Array<{
-    race: RaceWithCategories;
+    race: RaceWithCategoriesPlain;
     status: "closed" | "open" | "upcoming";
     time?: string;
   }>

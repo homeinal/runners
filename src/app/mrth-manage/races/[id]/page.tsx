@@ -1,6 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { serializeRaceForClient } from "@/lib/serialize";
 import RaceEditClient from "./RaceEditClient";
 
 async function checkAuth() {
@@ -26,7 +27,6 @@ export default async function RaceEditPage({ params }: Props) {
     where: { id },
     include: {
       categories: {
-        include: { schedules: true },
         orderBy: { createdAt: "asc" },
       },
     },
@@ -36,5 +36,7 @@ export default async function RaceEditPage({ params }: Props) {
     notFound();
   }
 
-  return <RaceEditClient race={race} />;
+  const raceForClient = serializeRaceForClient(race);
+
+  return <RaceEditClient race={raceForClient} />;
 }
