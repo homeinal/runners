@@ -47,6 +47,7 @@ export function FeaturedRaceCard({ race }: FeaturedRaceCardProps) {
             <div className="flex items-center gap-4">
               <Link
                 href={`/races/${race.id}`}
+                prefetch={false}
                 className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white text-border-dark border-2 border-border-dark px-6 py-3 rounded-full font-bold uppercase shadow-[var(--shadow-neobrutalism-sm)] hover:shadow-[var(--shadow-neobrutalism-hover)] hover:translate-x-[1px] hover:translate-y-[1px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
               >
                 지금 등록하기

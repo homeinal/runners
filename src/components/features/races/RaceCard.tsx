@@ -17,6 +17,7 @@ export function RaceCard({ race }: RaceCardProps) {
   return (
     <Link
       href={`/races/${race.id}`}
+      prefetch={false}
       className="flex flex-col md:flex-row items-center bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-xl shadow-[var(--shadow-neobrutalism)] p-4 gap-4 hover:shadow-[var(--shadow-neobrutalism-hover)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all group cursor-pointer"
     >
       {/* Date */}
