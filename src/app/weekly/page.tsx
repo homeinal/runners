@@ -21,9 +21,11 @@ import {
   toKST,
   nowKST,
   serializeDate,
+  KST_TIMEZONE,
 } from "@/lib/date";
 import { getRaceRegistrationPeriod } from "@/lib/utils";
 import { parseISO, isBefore, isAfter } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 
 type ViewMode = "week" | "month";
 
@@ -74,12 +76,19 @@ export default async function WeeklyPage({ searchParams }: WeeklyPageProps) {
     ? getMonthDatesKST(monthStart)
     : getWeekDatesKST(weekStart);
 
+  const dateRangeStartKst = new Date(
+    `${formatInTimeZone(dateRangeStart, KST_TIMEZONE, "yyyy-MM-dd")}T00:00:00+09:00`
+  );
+  const dateRangeEndKst = new Date(
+    `${formatInTimeZone(dateRangeEnd, KST_TIMEZONE, "yyyy-MM-dd")}T23:59:59.999+09:00`
+  );
+
   // 카테고리 REGISTRATION 스케줄을 기준으로 범위 내 대회 조회 (레거시 필드는 보조)
   const races = await prisma.race.findMany({
     where: {
       registrationStartAt: {
-        gte: dateRangeStart,
-        lte: dateRangeEnd,
+        gte: dateRangeStartKst,
+        lte: dateRangeEndKst,
       },
     },
     orderBy: [{ eventStartAt: "asc" }],
