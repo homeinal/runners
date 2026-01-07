@@ -90,8 +90,8 @@ export default async function WeeklyPage({ searchParams }: WeeklyPageProps) {
 
   const now = nowKST();
 
-  function determineRaceStatusLegacy(
-    race: any
+  function determineRaceStatus(
+    race: RaceWithCategories
   ): "closed" | "open" | "upcoming" {
     const { start: regStartRaw, end: regEndRaw } = getRaceRegistrationPeriod(
       race
@@ -108,54 +108,6 @@ export default async function WeeklyPage({ searchParams }: WeeklyPageProps) {
     if (regEnd && isAfter(now, regEnd)) return "closed";
     if (regStart && isBefore(now, regStart)) return "upcoming";
     return "open";
-  }
-
-  // 상태 결정 함수: RaceCategory.status 우선, 그 다음 스케줄 기반
-  function determineRaceStatus(
-    race: RaceWithCategories
-  ): "closed" | "open" | "upcoming" {
-    // 1순위: RaceCategory.status가 CLOSED면 무조건 마감
-    if (race.categories && race.categories.length > 0) {
-      const allClosed = race.categories.every((cat) => cat.status === "CLOSED");
-      if (allClosed) return "closed";
-
-      // 하나라도 OPEN이면 접수중
-      const hasOpen = race.categories.some((cat) => cat.status === "OPEN");
-      if (hasOpen) return "open";
-
-      // 하나라도 CANCELLED가 아닌 UPCOMING이 있으면 시간 기반 판단
-      const hasUpcoming = race.categories.some(
-        (cat) => cat.status === "UPCOMING"
-      );
-      if (hasUpcoming) {
-        // 시간 기반 판단
-        const { start: regStartRaw, end: regEndRaw } =
-          getRaceRegistrationPeriod(race);
-        const regStart = regStartRaw ? toKST(regStartRaw) : null;
-        const regEnd = regEndRaw ? toKST(regEndRaw) : null;
-
-        if (regStart && isBefore(now, regStart)) return "upcoming";
-        if (regStart && !isBefore(now, regStart) && (!regEnd || !isAfter(now, regEnd)))
-          return "open";
-        if (regEnd && isAfter(now, regEnd)) return "closed";
-
-        return "upcoming";
-      }
-    }
-
-    // 레거시: RaceCategory 없으면 날짜 기반으로만 판단
-    const { start: regStartRaw, end: regEndRaw } = getRaceRegistrationPeriod(
-      race
-    );
-    const regStart = regStartRaw ? toKST(regStartRaw) : null;
-    const regEnd = regEndRaw ? toKST(regEndRaw) : null;
-
-    if (regEnd && isAfter(now, regEnd)) return "closed";
-    if (regStart && !isBefore(now, regStart) && (!regEnd || !isAfter(now, regEnd)))
-      return "open";
-    if (regStart && isBefore(now, regStart)) return "upcoming";
-
-    return "upcoming";
   }
 
   // 날짜별로 그룹화: 접수시작일이 그 날인 대회만
