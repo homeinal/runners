@@ -94,18 +94,9 @@ export function ScheduleTimeline({ dayGroups, viewMode = "week" }: ScheduleTimel
                   {groupRacesByTime(group.races).map((timeGroup) => (
                     <div
                       key={timeGroup.time || "no-time"}
-                      className="grid grid-cols-1 md:grid-cols-12 gap-6 relative mb-6 last:mb-0"
+                      className="grid grid-cols-1 gap-6 relative mb-6 last:mb-0"
                     >
-                      <div className="md:col-span-2 text-right pr-2 md:pr-3 relative pt-2">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">
-                          {timeGroup.period}
-                        </span>
-                        <span className="text-xl font-black text-border-dark dark:text-white block">
-                          {timeGroup.time || "시간 미정"}
-                        </span>
-                        <div className="hidden md:block absolute right-0 md:right-[-4px] top-4 size-3 bg-white border-2 border-border-dark rounded-full z-10 translate-x-1/2" />
-                      </div>
-                      <div className="md:col-span-10 space-y-4">
+                      <div className="space-y-4">
                         {timeGroup.races.map(({ race, status, time }) => (
                           <ScheduleCard
                             key={race.id}
@@ -131,7 +122,7 @@ export function ScheduleTimeline({ dayGroups, viewMode = "week" }: ScheduleTimel
               key={group.date}
               className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-16 relative"
             >
-              <div className="md:col-span-2 text-right pr-2 md:pr-3 relative pt-2">
+              <div className="md:col-span-3 text-right pr-2 md:pr-3 relative pt-2">
                 <span className="text-gray-500 font-black text-sm uppercase">
                   TOMORROW
                 </span>
@@ -140,7 +131,7 @@ export function ScheduleTimeline({ dayGroups, viewMode = "week" }: ScheduleTimel
                 </h3>
                 <div className="hidden md:block absolute right-0 md:right-[-4px] top-4 size-4 bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-full z-10 translate-x-1/2" />
               </div>
-              <div className="md:col-span-10 space-y-6">
+              <div className="md:col-span-9 space-y-6">
                 {group.races.map(({ race, status, time }) => (
                   <ScheduleCard
                     key={race.id}

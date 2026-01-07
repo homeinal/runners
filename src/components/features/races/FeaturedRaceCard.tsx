@@ -18,7 +18,7 @@ export function FeaturedRaceCard({ race }: FeaturedRaceCardProps) {
         <div className="absolute -inset-1 bg-[#ff4d4d] rounded-xl skew-y-1 scale-105 border-2 border-border-dark z-0" />
 
         {/* Main card */}
-        <div className="relative flex flex-col md:flex-row items-stretch border-4 border-border-dark bg-primary rounded-xl overflow-hidden shadow-[var(--shadow-neobrutalism)] z-10 transition-transform duration-300 hover:-translate-y-1">
+        <div className="relative flex flex-col items-stretch border-4 border-border-dark bg-primary rounded-xl overflow-hidden shadow-[var(--shadow-neobrutalism)] z-10 transition-transform duration-300 hover:-translate-y-1">
           {/* Content */}
           <div className="flex-1 p-6 md:p-8 flex flex-col justify-between gap-6">
             <div>
@@ -53,23 +53,6 @@ export function FeaturedRaceCard({ race }: FeaturedRaceCardProps) {
                 <span className="material-symbols-outlined">arrow_forward</span>
               </Link>
             </div>
-          </div>
-
-          {/* Image section */}
-          <div className="w-full md:w-2/5 min-h-[200px] md:min-h-auto border-t-4 md:border-t-0 md:border-l-4 border-border-dark relative">
-            {race.imageUrl ? (
-              <div
-                className="absolute inset-0 bg-cover bg-center grayscale contrast-125"
-                style={{ backgroundImage: `url('${race.imageUrl}')` }}
-              />
-            ) : (
-              <div className="absolute inset-0 bg-border-dark/10 flex items-center justify-center">
-                <span className="material-symbols-outlined text-6xl text-border-dark/30">
-                  directions_run
-                </span>
-              </div>
-            )}
-            <div className="absolute inset-0 bg-primary mix-blend-multiply opacity-40" />
           </div>
         </div>
       </div>
