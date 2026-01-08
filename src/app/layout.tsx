@@ -34,8 +34,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "https://maedal.com/runner_medal_.png",
-        width: 1024,
-        height: 1024,
+        width: 1200,
+        height: 630,
         alt: "Maedal",
       },
     ],
