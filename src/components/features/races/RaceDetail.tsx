@@ -9,6 +9,7 @@ import {
 import { formatTime } from "@/lib/date";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { Icon } from "@/components/ui/Icon";
 
 interface RaceDetailProps {
   race: RaceWithCategories;
@@ -28,9 +29,7 @@ export function RaceDetail({ race }: RaceDetailProps) {
       <Card variant="section" className="relative overflow-hidden group">
         {/* Watermark Icon */}
         <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none group-hover:opacity-20 transition-opacity">
-          <span className="material-symbols-outlined text-[150px] md:text-[200px] leading-none">
-            sprint
-          </span>
+          <Icon name="sprint" className="text-[150px] md:text-[200px] leading-none" />
         </div>
 
         {/* Badges */}
@@ -47,9 +46,7 @@ export function RaceDetail({ race }: RaceDetailProps) {
         {/* Date & Location */}
         <div className="flex flex-col md:flex-row gap-6 md:items-center mt-6 pt-6 border-t-2 border-black relative z-10">
           <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-3xl">
-              calendar_month
-            </span>
+            <Icon name="calendar_month" className="text-3xl" />
             <div className="flex flex-col leading-none">
               <span className="font-bold text-lg">{formatDate(eventDate)}</span>
               <span className="text-sm font-medium uppercase text-gray-600">
@@ -61,9 +58,7 @@ export function RaceDetail({ race }: RaceDetailProps) {
           <div className="hidden md:block w-px h-10 bg-black mx-2" />
 
           <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-3xl">
-              location_on
-            </span>
+            <Icon name="location_on" className="text-3xl" />
             <div className="flex flex-col leading-none">
               <span className="font-bold text-lg">
                 {race.country}, {race.region || "지역 미정"}
@@ -80,9 +75,10 @@ export function RaceDetail({ race }: RaceDetailProps) {
       <section className="bg-primary border-2 border-border-dark shadow-[var(--shadow-neobrutalism)] p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6 w-full text-black dark:text-black">
         <div className="flex flex-col gap-4 w-full md:w-auto">
           <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-4xl text-black dark:text-black">
-              app_registration
-            </span>
+            <Icon
+              name="app_registration"
+              className="text-4xl text-black dark:text-black"
+            />
             <div className="flex flex-col">
               <span className="text-xs font-bold uppercase mb-0.5 text-black dark:text-black">
                 접수 상태
@@ -116,9 +112,10 @@ export function RaceDetail({ race }: RaceDetailProps) {
                 <span className="font-black text-lg uppercase">
                   공식 웹사이트
                 </span>
-                <span className="material-symbols-outlined text-2xl group-hover:translate-x-1 transition-transform">
-                  arrow_forward
-                </span>
+                <Icon
+                  name="arrow_forward"
+                  className="text-2xl group-hover:translate-x-1 transition-transform"
+                />
               </div>
             </a>
             <div className="text-[10px] uppercase font-bold opacity-60">
@@ -132,7 +129,7 @@ export function RaceDetail({ race }: RaceDetailProps) {
       {categoryNames.length > 0 && (
         <Card variant="section">
           <h3 className="text-xl font-black uppercase mb-4 flex items-center gap-2">
-            <span className="material-symbols-outlined">category</span>
+            <Icon name="category" />
             종목
           </h3>
           <div className="flex flex-wrap gap-3">
@@ -153,13 +150,9 @@ export function RaceDetail({ race }: RaceDetailProps) {
         <div className="md:w-1/3 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <h4 className="font-black text-2xl uppercase">장소</h4>
-            <span className="material-symbols-outlined text-3xl md:hidden">
-              stadium
-            </span>
+            <Icon name="stadium" className="text-3xl md:hidden" />
           </div>
-          <span className="material-symbols-outlined text-4xl hidden md:block mt-2">
-            stadium
-          </span>
+          <Icon name="stadium" className="text-4xl hidden md:block mt-2" />
         </div>
         <div className="md:w-2/3 flex flex-col gap-4">
           <div className="flex flex-col gap-4 md:flex-row md:justify-between">
@@ -189,13 +182,9 @@ export function RaceDetail({ race }: RaceDetailProps) {
           <div className="md:w-1/3 flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <h4 className="font-black text-2xl uppercase">주최</h4>
-              <span className="material-symbols-outlined text-3xl md:hidden">
-                groups
-              </span>
+              <Icon name="groups" className="text-3xl md:hidden" />
             </div>
-            <span className="material-symbols-outlined text-4xl hidden md:block mt-2">
-              groups
-            </span>
+            <Icon name="groups" className="text-4xl hidden md:block mt-2" />
           </div>
           <div className="md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex flex-col gap-1 border-l-4 border-primary pl-4">
@@ -232,13 +221,9 @@ export function RaceDetail({ race }: RaceDetailProps) {
           <div className="md:w-1/3 flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <h4 className="font-black text-2xl uppercase">문의</h4>
-              <span className="material-symbols-outlined text-3xl md:hidden">
-                perm_phone_msg
-              </span>
+              <Icon name="perm_phone_msg" className="text-3xl md:hidden" />
             </div>
-            <span className="material-symbols-outlined text-4xl hidden md:block mt-2">
-              perm_phone_msg
-            </span>
+            <Icon name="perm_phone_msg" className="text-4xl hidden md:block mt-2" />
           </div>
           <div className="md:w-2/3 flex flex-col md:flex-row gap-6 items-start md:items-center">
             {race.phone && (

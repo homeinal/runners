@@ -12,7 +12,7 @@
   --color-foreground: #1c1c0d;
 
   /* Font Families */
-  --font-display: "Noto Sans KR", "Spline Sans", sans-serif;
+  --font-display: var(--font-noto-sans-kr), var(--font-spline-sans), sans-serif;
 
   /* Border Radius */
   --radius-DEFAULT: 1rem;
@@ -54,15 +54,6 @@ body {
 ::selection {
   background-color: var(--color-primary);
   color: var(--color-border-dark);
-}
-
-/* Material Symbols font settings */
-.material-symbols-outlined {
-  font-variation-settings:
-    'FILL' 0,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24;
 }
 
 /* Hide scrollbar utility */

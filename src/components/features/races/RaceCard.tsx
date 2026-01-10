@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { RaceWithCategories } from "@/types";
 import { formatDayMonth, getRaceRegistrationStatus, getRaceCategoryNames } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
+import { Icon } from "@/components/ui/Icon";
 
 interface RaceCardProps {
   race: RaceWithCategories;
@@ -44,9 +45,7 @@ export function RaceCard({ race }: RaceCardProps) {
         >
           {!race.imageUrl && (
             <div className="size-full flex items-center justify-center">
-              <span className="material-symbols-outlined text-2xl text-gray-400">
-                directions_run
-              </span>
+              <Icon name="directions_run" className="text-2xl text-gray-400" />
             </div>
           )}
         </div>
@@ -57,9 +56,7 @@ export function RaceCard({ race }: RaceCardProps) {
             {race.title}
           </h3>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <span className="material-symbols-outlined text-lg">
-              location_on
-            </span>
+            <Icon name="location_on" className="text-lg" />
             <span className="text-sm font-medium">
               {race.country} {race.region}
             </span>

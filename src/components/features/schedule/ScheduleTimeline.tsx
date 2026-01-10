@@ -1,6 +1,7 @@
 import type { RaceWithCategories } from "@/types";
 import { ScheduleCard } from "./ScheduleCard";
 import { formatDateWithDayEn, getDateParts } from "@/lib/date";
+import { Icon } from "@/components/ui/Icon";
 
 type ViewMode = "week" | "month";
 
@@ -27,9 +28,10 @@ export function ScheduleTimeline({ dayGroups, viewMode = "week" }: ScheduleTimel
   if (viewMode === "month" && dayGroups.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <span className="material-symbols-outlined text-gray-300 dark:text-gray-600 text-6xl mb-4">
-          event_busy
-        </span>
+        <Icon
+          name="event_busy"
+          className="text-gray-300 dark:text-gray-600 text-6xl mb-4"
+        />
         <p className="text-xl font-bold text-gray-400 dark:text-gray-500">
           이번 달에는 접수 일정이 없습니다.
         </p>
@@ -81,9 +83,7 @@ export function ScheduleTimeline({ dayGroups, viewMode = "week" }: ScheduleTimel
                 <div className="md:col-span-9">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="inline-flex items-center gap-2 bg-border-dark text-white px-4 py-1.5 rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] -rotate-1">
-                      <span className="material-symbols-outlined text-primary text-xl">
-                        campaign
-                      </span>
+                      <Icon name="campaign" className="text-primary text-xl" />
                       <span className="font-black text-lg uppercase">
                         오늘 접수 시작
                       </span>
@@ -205,9 +205,7 @@ export function ScheduleTimeline({ dayGroups, viewMode = "week" }: ScheduleTimel
                 ))
               ) : (
                 <div className="border-2 border-dashed border-gray-200 dark:border-white/10 rounded-xl p-8 flex flex-col items-center justify-center text-center gap-2">
-                  <span className="material-symbols-outlined text-gray-300 text-3xl">
-                    event_upcoming
-                  </span>
+                  <Icon name="event_upcoming" className="text-gray-300 text-3xl" />
                   <p className="text-gray-400 font-bold text-sm">
                     등록된 일정이 아직 없습니다.
                   </p>

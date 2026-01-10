@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Header, Footer } from "@/components/layout";
+import { Icon } from "@/components/ui/Icon";
 
 export default function NotFound() {
   return (
@@ -16,7 +17,7 @@ export default function NotFound() {
             href="/"
             className="inline-flex items-center gap-2 bg-primary text-border-dark border-2 border-border-dark px-6 py-3 rounded-full font-bold uppercase shadow-[var(--shadow-neobrutalism)] hover:shadow-[var(--shadow-neobrutalism-hover)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
           >
-            <span className="material-symbols-outlined">arrow_back</span>
+            <Icon name="arrow_back" />
             대회 목록으로 돌아가기
           </Link>
         </div>

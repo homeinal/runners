@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { RaceWithCategories, RaceWithCategoriesPlain } from "@/types";
 import { getRaceCategoryNames, getRaceRegistrationPeriod } from "@/lib/utils";
+import { Icon, type IconName } from "@/components/ui/Icon";
 
 type ScheduleStatus = "closed" | "open" | "upcoming";
 
@@ -11,7 +12,19 @@ interface ScheduleCardProps {
   showTopPick?: boolean;
 }
 
-function getStatusConfig(status: ScheduleStatus) {
+type StatusConfig = {
+  bgColor: string;
+  icon: IconName;
+  iconColor: string;
+  label: string;
+  labelBg: string;
+  labelText: string;
+  cardOpacity: string;
+  textColor: string;
+  animate: boolean;
+};
+
+function getStatusConfig(status: ScheduleStatus): StatusConfig {
   switch (status) {
     case "closed":
       return {
@@ -84,11 +97,10 @@ export function ScheduleCard({
         >
           {status === "upcoming" && regStart ? (
             <>
-              <span
-                className={`material-symbols-outlined text-2xl ${config.iconColor} mb-1`}
-              >
-                {config.icon}
-              </span>
+              <Icon
+                name={config.icon}
+                className={`text-2xl ${config.iconColor} mb-1`}
+              />
               <span className="text-[9px] font-black uppercase tracking-wider text-gray-500">
                 Opens
               </span>
@@ -102,11 +114,10 @@ export function ScheduleCard({
             </>
           ) : status === "open" && time ? (
             <>
-              <span
-                className={`material-symbols-outlined text-2xl ${config.iconColor} mb-1 animate-pulse`}
-              >
-                check_circle
-              </span>
+              <Icon
+                name="check_circle"
+                className={`text-2xl ${config.iconColor} mb-1 animate-pulse`}
+              />
               <span className="text-xl font-black block leading-none text-border-dark">
                 {time}
               </span>
@@ -116,11 +127,10 @@ export function ScheduleCard({
             </>
           ) : (
             <>
-              <span
-                className={`material-symbols-outlined text-2xl ${config.iconColor} mb-1 ${config.animate ? "animate-bounce" : ""}`}
-              >
-                {config.icon}
-              </span>
+              <Icon
+                name={config.icon}
+                className={`text-2xl ${config.iconColor} mb-1 ${config.animate ? "animate-bounce" : ""}`}
+              />
               {config.label && (
                 <span
                   className={`${config.labelBg} border border-border-dark px-1.5 py-0.5 rounded shadow-[1px_1px_0px_0px_rgba(0,0,0,${status === "closed" ? "0.5" : "1"})]`}
@@ -177,15 +187,11 @@ export function ScheduleCard({
             className={`flex items-center gap-4 text-xs font-bold ${status === "closed" ? "text-gray-500" : "text-gray-600 dark:text-gray-300"}`}
           >
             <div className="flex items-center gap-1">
-              <span className="material-symbols-outlined text-sm">
-                location_on
-              </span>
+              <Icon name="location_on" className="text-sm" />
               {race.venue || race.region || "장소 미정"}
             </div>
             <div className="flex items-center gap-1">
-              <span className="material-symbols-outlined text-sm">
-                calendar_month
-              </span>
+              <Icon name="calendar_month" className="text-sm" />
               {formatEventDate()}
             </div>
           </div>

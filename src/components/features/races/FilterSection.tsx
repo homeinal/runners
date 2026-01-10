@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
+import { Icon } from "@/components/ui/Icon";
 
 const SORT_OPTIONS = [
   { value: "registration", label: "접수시작일순" },
@@ -136,9 +137,10 @@ export function FilterSection({ regions }: FilterSectionProps) {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-48 pl-9 pr-4 py-1.5 text-sm bg-transparent border border-gray-300 rounded-lg focus:outline-none focus:border-black dark:focus:border-white"
               />
-              <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-lg text-gray-400">
-                search
-              </span>
+              <Icon
+                name="search"
+                className="absolute left-2 top-1/2 -translate-y-1/2 text-lg text-gray-400"
+              />
             </div>
           </form>
         </div>
@@ -184,9 +186,10 @@ export function FilterSection({ regions }: FilterSectionProps) {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-4 py-1.5 text-sm bg-transparent border border-gray-300 rounded-lg focus:outline-none focus:border-black dark:focus:border-white"
             />
-            <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-lg text-gray-400">
-              search
-            </span>
+            <Icon
+              name="search"
+              className="absolute left-2 top-1/2 -translate-y-1/2 text-lg text-gray-400"
+            />
           </div>
         </form>
       </div>

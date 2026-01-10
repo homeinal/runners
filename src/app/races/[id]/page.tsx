@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Header, Footer } from "@/components/layout";
 import { RaceDetail } from "@/components/features/races";
+import { Icon } from "@/components/ui/Icon";
 
 export const revalidate = 86400;
 
@@ -87,9 +88,10 @@ export default async function RaceDetailPage({ params }: PageProps) {
             href="/"
             className="group flex items-center gap-2 font-bold text-sm uppercase tracking-wide hover:underline"
           >
-            <span className="material-symbols-outlined text-lg group-hover:-translate-x-1 transition-transform">
-              arrow_back
-            </span>
+            <Icon
+              name="arrow_back"
+              className="text-lg group-hover:-translate-x-1 transition-transform"
+            />
             대회 목록으로
           </Link>
           <div className="flex gap-2 text-sm font-bold uppercase opacity-60">

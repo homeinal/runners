@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
+import { Icon } from "@/components/ui/Icon";
 
 interface LoadMoreButtonProps {
   hasMore: boolean;
@@ -38,9 +39,7 @@ export function LoadMoreButton({ hasMore, currentPage }: LoadMoreButtonProps) {
         disabled={isPending}
         className="bg-white dark:bg-background-dark text-border-dark dark:text-white border-2 border-border-dark dark:border-white px-8 py-3 rounded-full font-bold text-sm shadow-[var(--shadow-neobrutalism)] hover:shadow-[var(--shadow-neobrutalism-hover)] hover:translate-x-[1px] hover:translate-y-[1px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all uppercase flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <span className="material-symbols-outlined">
-          {isPending ? "hourglass_empty" : "refresh"}
-        </span>
+        <Icon name={isPending ? "hourglass_empty" : "refresh"} />
         {isPending ? "로딩 중..." : "대회 더 보기"}
       </button>
     </div>
