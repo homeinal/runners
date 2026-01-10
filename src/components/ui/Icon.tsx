@@ -107,8 +107,7 @@ const ICONS: Record<IconName, LucideIcon> = {
 
 export function Icon({ name, className, size = "1em", ...props }: IconProps) {
   const LucideIcon = ICONS[name];
-  const hasLabel =
-    props["aria-label"] || props["aria-labelledby"] || props.title;
+  const hasLabel = props["aria-label"] || props["aria-labelledby"];
 
   return (
     <LucideIcon
