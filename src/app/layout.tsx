@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://maedal.com/OG_image.png",
+        url: "/OG_image.png",
         width: 945,
         height: 630,
         alt: "Maedal",
@@ -41,8 +41,8 @@ export const metadata: Metadata = {
     ],
   },
   twitter: {
-    card: "summary",
-    images: ["https://maedal.com/OG_image.png"],
+    card: "summary_large_image",
+    images: ["/OG_image.png"],
   },
 };
 
