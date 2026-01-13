@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { ArrowLeft, RefreshCw } from "lucide-react";
-import { Header, Footer } from "@/components/layout";
+import { Footer } from "@/components/layout";
+import { HeaderClient } from "@/components/layout/HeaderClient";
 
 export default function Error({
   error,
@@ -13,7 +14,7 @@ export default function Error({
 }) {
   return (
     <>
-      <Header />
+      <HeaderClient />
       <main className="flex-1 flex flex-col items-center justify-center min-h-[60vh] px-4">
         <div className="text-center">
           <h1 className="text-4xl font-black mb-4">문제가 발생했습니다</h1>
