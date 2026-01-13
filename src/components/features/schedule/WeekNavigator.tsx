@@ -16,7 +16,7 @@ import {
   addMonthsKST,
 } from "@/lib/date";
 import { parseISO, startOfWeek, addMonths, startOfMonth, addDays } from "date-fns";
-import { Icon } from "@/components/ui/Icon";
+import { Calendar, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 
 type ViewMode = "week" | "month";
 
@@ -174,7 +174,7 @@ export function WeekNavigator({
           Registration Schedule
         </h2>
         <div className="flex items-center gap-2 text-gray-500">
-          <Icon name="schedule" />
+          <Clock size="1em" />
           <span className="text-sm font-bold">
             현재 시간: {formatCurrentTimeKorean(currentDate)}
           </span>
@@ -214,7 +214,7 @@ export function WeekNavigator({
               className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
               aria-label={viewMode === "week" ? "이전 주" : "이전 월"}
             >
-              <Icon name="chevron_left" />
+              <ChevronLeft size="1em" />
             </button>
             <button
               onClick={() => {
@@ -227,7 +227,7 @@ export function WeekNavigator({
               }}
               className="flex items-center px-4 py-2 border-x-2 border-gray-100 dark:border-white/10 gap-2 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
             >
-              <Icon name="calendar_month" className="text-gray-400" />
+              <Calendar className="text-gray-400" size="1em" />
               <div className="flex flex-col items-center">
                 {viewMode === "week" ? (
                   <>
@@ -255,7 +255,7 @@ export function WeekNavigator({
               className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
               aria-label={viewMode === "week" ? "다음 주" : "다음 월"}
             >
-              <Icon name="chevron_right" />
+              <ChevronRight size="1em" />
             </button>
           </div>
 
@@ -268,7 +268,7 @@ export function WeekNavigator({
                 onClick={() => changeMonth("prev")}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
               >
-                <Icon name="chevron_left" />
+                <ChevronLeft size="1em" />
               </button>
               <span className="font-black text-lg">
                 {getDateParts(calendarMonth).year}년{" "}
@@ -278,7 +278,7 @@ export function WeekNavigator({
                 onClick={() => changeMonth("next")}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
               >
-                <Icon name="chevron_right" />
+                <ChevronRight size="1em" />
               </button>
             </div>
 
@@ -357,7 +357,7 @@ export function WeekNavigator({
                 onClick={() => changeYear("prev")}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
               >
-                <Icon name="chevron_left" />
+                <ChevronLeft size="1em" />
               </button>
               <span className="font-black text-xl">
                 {calendarYear}년
@@ -366,7 +366,7 @@ export function WeekNavigator({
                 onClick={() => changeYear("next")}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"
               >
-                <Icon name="chevron_right" />
+                <ChevronRight size="1em" />
               </button>
             </div>
 

@@ -265,7 +265,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
         {/* Filter Section */}
         <Suspense fallback={<div className="h-32" />}>
-          <FilterSection regions={regions} />
+          <FilterSection regions={regions} searchParams={params} />
         </Suspense>
 
         {/* Section Divider */}
@@ -289,7 +289,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
         {/* Load More Button */}
         <Suspense fallback={null}>
-          <LoadMoreButton hasMore={hasMore} currentPage={page} />
+          <LoadMoreButton
+            hasMore={hasMore}
+            currentPage={page}
+            searchParams={params}
+          />
         </Suspense>
       </main>
       <Footer />

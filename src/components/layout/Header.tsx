@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { CalendarRange, Menu, PersonStanding, Timer } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
-import { Icon } from "@/components/ui/Icon";
 
 export function Header() {
   const pathname = usePathname();
@@ -18,18 +18,14 @@ export function Header() {
         <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
           <Link href="/" className="flex items-center gap-3">
             <div className="size-10 bg-primary border-2 border-border-dark rounded-full flex items-center justify-center shadow-[var(--shadow-neobrutalism-sm)]">
-              <Icon
-                name="directions_run"
-                className="text-border-dark"
-                style={{ fontSize: "24px" }}
-              />
+              <PersonStanding className="text-border-dark" size={24} />
             </div>
             <h1 className="text-2xl font-black tracking-tighter uppercase italic">
               MAEDAL
             </h1>
           </Link>
           <button className="md:hidden p-2" aria-label="메뉴 열기">
-            <Icon name="menu" />
+            <Menu size="1em" />
           </button>
         </div>
 
@@ -43,7 +39,7 @@ export function Header() {
                 : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
             }`}
           >
-            <Icon name="calendar_view_week" className="text-lg" />
+            <CalendarRange className="text-lg" size="1em" />
             주간접수
           </Link>
           <Link
@@ -54,7 +50,7 @@ export function Header() {
                 : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
             }`}
           >
-            <Icon name="timer" className="text-lg" />
+            <Timer className="text-lg" size="1em" />
             접수임박
           </Link>
           <Link

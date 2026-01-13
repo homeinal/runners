@@ -1,7 +1,14 @@
 import Link from "next/link";
 import type { RaceWithCategories, RaceWithCategoriesPlain } from "@/types";
 import { getRaceCategoryNames, getRaceRegistrationPeriod } from "@/lib/utils";
-import { Icon, type IconName } from "@/components/ui/Icon";
+import {
+  AlarmClock,
+  Calendar,
+  CheckCircle,
+  MapPin,
+  TimerOff,
+  type LucideIcon,
+} from "lucide-react";
 
 type ScheduleStatus = "closed" | "open" | "upcoming";
 
@@ -14,7 +21,7 @@ interface ScheduleCardProps {
 
 type StatusConfig = {
   bgColor: string;
-  icon: IconName;
+  IconComponent: LucideIcon;
   iconColor: string;
   label: string;
   labelBg: string;
@@ -29,7 +36,7 @@ function getStatusConfig(status: ScheduleStatus): StatusConfig {
     case "closed":
       return {
         bgColor: "bg-gray-100 dark:bg-white/5",
-        icon: "timer_off",
+        IconComponent: TimerOff,
         iconColor: "text-gray-400",
         label: "마감",
         labelBg: "bg-gray-200",
@@ -41,7 +48,7 @@ function getStatusConfig(status: ScheduleStatus): StatusConfig {
     case "open":
       return {
         bgColor: "bg-primary",
-        icon: "alarm_on",
+        IconComponent: AlarmClock,
         iconColor: "text-border-dark",
         label: "등록 가능",
         labelBg: "bg-white",
@@ -53,7 +60,7 @@ function getStatusConfig(status: ScheduleStatus): StatusConfig {
     case "upcoming":
       return {
         bgColor: "bg-white dark:bg-white/10",
-        icon: "calendar_month",
+        IconComponent: Calendar,
         iconColor: "text-gray-400",
         label: "",
         labelBg: "",
@@ -72,6 +79,7 @@ export function ScheduleCard({
   showTopPick = false,
 }: ScheduleCardProps) {
   const config = getStatusConfig(status);
+  const StatusIcon = config.IconComponent;
   const categoryNames = getRaceCategoryNames(race);
   const { start: regStart } = getRaceRegistrationPeriod(race);
   const eventDate = new Date(race.eventStartAt);
@@ -97,9 +105,10 @@ export function ScheduleCard({
         >
           {status === "upcoming" && regStart ? (
             <>
-              <Icon
-                name={config.icon}
+              <StatusIcon
                 className={`text-2xl ${config.iconColor} mb-1`}
+                size="1em"
+                aria-hidden
               />
               <span className="text-[9px] font-black uppercase tracking-wider text-gray-500">
                 Opens
@@ -114,9 +123,10 @@ export function ScheduleCard({
             </>
           ) : status === "open" && time ? (
             <>
-              <Icon
-                name="check_circle"
+              <CheckCircle
                 className={`text-2xl ${config.iconColor} mb-1 animate-pulse`}
+                size="1em"
+                aria-hidden
               />
               <span className="text-xl font-black block leading-none text-border-dark">
                 {time}
@@ -127,9 +137,10 @@ export function ScheduleCard({
             </>
           ) : (
             <>
-              <Icon
-                name={config.icon}
+              <StatusIcon
                 className={`text-2xl ${config.iconColor} mb-1 ${config.animate ? "animate-bounce" : ""}`}
+                size="1em"
+                aria-hidden
               />
               {config.label && (
                 <span
@@ -187,11 +198,11 @@ export function ScheduleCard({
             className={`flex items-center gap-4 text-xs font-bold ${status === "closed" ? "text-gray-500" : "text-gray-600 dark:text-gray-300"}`}
           >
             <div className="flex items-center gap-1">
-              <Icon name="location_on" className="text-sm" />
+              <MapPin className="text-sm" size="1em" aria-hidden />
               {race.venue || race.region || "장소 미정"}
             </div>
             <div className="flex items-center gap-1">
-              <Icon name="calendar_month" className="text-sm" />
+              <Calendar className="text-sm" size="1em" aria-hidden />
               {formatEventDate()}
             </div>
           </div>

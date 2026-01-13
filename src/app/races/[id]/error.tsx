@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowLeft, RefreshCw } from "lucide-react";
 import { Header, Footer } from "@/components/layout";
-import { Icon } from "@/components/ui/Icon";
 
 export default function Error({
   error,
@@ -25,14 +25,14 @@ export default function Error({
               onClick={reset}
               className="inline-flex items-center gap-2 bg-primary text-border-dark border-2 border-border-dark px-6 py-3 rounded-full font-bold uppercase shadow-[var(--shadow-neobrutalism)] hover:shadow-[var(--shadow-neobrutalism-hover)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
-              <Icon name="refresh" />
+              <RefreshCw size="1em" />
               다시 시도
             </button>
             <Link
               href="/"
               className="inline-flex items-center gap-2 bg-white text-border-dark border-2 border-border-dark px-6 py-3 rounded-full font-bold uppercase shadow-[var(--shadow-neobrutalism)] hover:shadow-[var(--shadow-neobrutalism-hover)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
-              <Icon name="arrow_back" />
+              <ArrowLeft size="1em" />
               대회 목록으로
             </Link>
           </div>

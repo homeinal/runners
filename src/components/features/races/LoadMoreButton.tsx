@@ -1,19 +1,24 @@
-"use client";
-
-import { useRouter, useSearchParams } from "next/navigation";
-import { useTransition } from "react";
-import { Icon } from "@/components/ui/Icon";
+import Link from "next/link";
+import { RefreshCw } from "lucide-react";
 
 interface LoadMoreButtonProps {
   hasMore: boolean;
   currentPage: number;
+  searchParams: {
+    sort?: string;
+    region?: string;
+    status?: string;
+    distance?: string;
+    page?: string;
+    q?: string;
+  };
 }
 
-export function LoadMoreButton({ hasMore, currentPage }: LoadMoreButtonProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
-
+export function LoadMoreButton({
+  hasMore,
+  currentPage,
+  searchParams,
+}: LoadMoreButtonProps) {
   if (!hasMore) {
     return (
       <div className="flex justify-center mt-8">
@@ -24,24 +29,26 @@ export function LoadMoreButton({ hasMore, currentPage }: LoadMoreButtonProps) {
     );
   }
 
-  const handleLoadMore = () => {
-    startTransition(() => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("page", String(currentPage + 1));
-      router.push(`/?${params.toString()}`, { scroll: false });
-    });
-  };
+  const params = new URLSearchParams();
+  Object.entries(searchParams).forEach(([key, value]) => {
+    if (!value) return;
+    params.set(key, value);
+  });
+  params.set("page", String(currentPage + 1));
+
+  const href = `/?${params.toString()}`;
 
   return (
     <div className="flex justify-center mt-8">
-      <button
-        onClick={handleLoadMore}
-        disabled={isPending}
-        className="bg-white dark:bg-background-dark text-border-dark dark:text-white border-2 border-border-dark dark:border-white px-8 py-3 rounded-full font-bold text-sm shadow-[var(--shadow-neobrutalism)] hover:shadow-[var(--shadow-neobrutalism-hover)] hover:translate-x-[1px] hover:translate-y-[1px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all uppercase flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+      <Link
+        href={href}
+        scroll={false}
+        prefetch={false}
+        className="bg-white dark:bg-background-dark text-border-dark dark:text-white border-2 border-border-dark dark:border-white px-8 py-3 rounded-full font-bold text-sm shadow-[var(--shadow-neobrutalism)] hover:shadow-[var(--shadow-neobrutalism-hover)] hover:translate-x-[1px] hover:translate-y-[1px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all uppercase flex items-center gap-2"
       >
-        <Icon name={isPending ? "hourglass_empty" : "refresh"} />
-        {isPending ? "로딩 중..." : "대회 더 보기"}
-      </button>
+        <RefreshCw size="1em" />
+        대회 더 보기
+      </Link>
     </div>
   );
 }
