@@ -72,6 +72,12 @@ export default function RootLayout({
             `,
           }}
         />
+        <meta
+          name="google-adsense-account"
+          content="ca-pub-3411274862132015"
+        />
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3411274862132015"
+     crossOrigin="anonymous"></script>
       </head>
       <body
         className={`${notoSansKR.variable} ${splineSans.variable} font-display bg-background-light dark:bg-background-dark text-border-dark dark:text-background-light min-h-screen flex flex-col relative overflow-x-hidden antialiased`}
