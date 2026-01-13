@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import { Header, Footer } from "@/components/layout";
 import {
@@ -264,9 +263,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         {featuredRace && <FeaturedRaceCard race={featuredRace} />}
 
         {/* Filter Section */}
-        <Suspense fallback={<div className="h-32" />}>
-          <FilterSection regions={regions} searchParams={params} />
-        </Suspense>
+        <FilterSection regions={regions} searchParams={params} />
 
         {/* Section Divider */}
         <div className="flex items-center gap-4 py-2">
@@ -288,13 +285,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         )}
 
         {/* Load More Button */}
-        <Suspense fallback={null}>
-          <LoadMoreButton
-            hasMore={hasMore}
-            currentPage={page}
-            searchParams={params}
-          />
-        </Suspense>
+        <LoadMoreButton
+          hasMore={hasMore}
+          currentPage={page}
+          searchParams={params}
+        />
       </main>
       <Footer />
     </>
