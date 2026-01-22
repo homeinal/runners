@@ -1,21 +1,15 @@
 import { redirect, notFound } from "next/navigation";
-import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { serializeRaceForClient } from "@/lib/serialize";
 import RaceEditClient from "./RaceEditClient";
-
-async function checkAuth() {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("admin_session");
-  return !!session?.value;
-}
+import { isAdminAuthenticated } from "@/lib/admin-session";
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
 export default async function RaceEditPage({ params }: Props) {
-  const isAuthenticated = await checkAuth();
+  const isAuthenticated = await isAdminAuthenticated();
 
   if (!isAuthenticated) {
     redirect("/mrth-manage");

@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarRange, Timer } from "lucide-react";
+import { Album, CalendarRange, Timer } from "lucide-react";
 
 export function HeaderNav() {
   const pathname = usePathname();
+  const isPostsPage = pathname === "/posts";
   const isUrgentPage = pathname === "/urgent";
   const isWeeklyPage = pathname === "/weekly";
   const isHomePage = pathname === "/";
@@ -34,6 +35,15 @@ export function HeaderNav() {
         <Timer className="text-lg" size="1em" />
         접수 임박
       </Link>
+      <Link href="/posts" 
+        className={`px-4 md:px-6 py-2 rounded-full font-black text-sm uppercase flex items-center gap-2 transition-colors whitespace-nowrap ${
+          isPostsPage
+            ? "bg-primary border-2 border-border-dark shadow-sm text-border-dark"
+            : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
+        }`}>
+          <Album name="write" className="text-lg" size="1em" />
+          컬럼
+        </Link>
       <Link
         href="/"
         className={`px-4 md:px-6 py-2 rounded-full font-bold text-sm uppercase transition-colors whitespace-nowrap ${

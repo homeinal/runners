@@ -8,15 +8,94 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// Registration status
-enum RegistrationStatus {
-  open
-  closed
-  unknown
+model Race {
+  id                  String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title               String
+  eventStartAt        DateTime                 @map("event_start_at") @db.Timestamptz(6)
+  eventTimezone       String                   @default("Asia/Seoul") @map("event_timezone")
+  eventTimeRaw        String?                  @map("event_time_raw")
+  country             String
+  region              String?
+  venue               String?
+  registrationStatus  registration_status_enum @default(unknown) @map("registration_status")
+  registrationStartAt DateTime?                @map("registration_start_at") @db.Timestamptz(6)
+  registrationEndAt   DateTime?                @map("registration_end_at") @db.Timestamptz(6)
+  categoriesRaw       String[]                 @map("categories_raw")
+  organizer           String
+  organizerRep        String?                  @map("organizer_rep")
+  phone               String?
+  email               String?
+  website             String?
+  imageUrl            String?                  @map("image_url")
+  isFeatured          Boolean                  @default(false) @map("is_featured")
+  isUrgent            Boolean                  @default(false) @map("is_urgent")
+  createdAt           DateTime                 @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime                 @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  sourceUrl           String?                  @map("source_url")
+  categories          RaceEventCategory[]
+
+  @@index([categoriesRaw], map: "idx_races_categories_raw_gin", type: Gin)
+  @@index([country, region, eventStartAt], map: "idx_races_country_region_event")
+  @@index([createdAt], map: "idx_races_created_at")
+  @@index([eventStartAt], map: "idx_races_event_start_at")
+  @@index([region, eventStartAt], map: "idx_races_region_event_start_at")
+  @@index([region(ops: raw("gin_trgm_ops"))], map: "idx_races_region_trgm", type: Gin)
+  @@index([registrationStartAt], map: "idx_races_registration_start_at")
+  @@index([registrationStatus], map: "idx_races_registration_status")
+  @@index([title(ops: raw("gin_trgm_ops"))], map: "idx_races_title_trgm", type: Gin)
+  @@index([venue(ops: raw("gin_trgm_ops"))], map: "idx_races_venue_trgm", type: Gin)
+  @@map("races")
 }
 
-// Race category type
-enum RaceCategoryType {
+model RaceEventCategory {
+  id            String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  raceId        String                  @map("race_id") @db.Uuid
+  rawName       String                  @map("raw_name")
+  canonicalName String                  @map("canonical_name")
+  distanceKm    Decimal?                @map("distance_km") @db.Decimal
+  type          race_category_type_enum
+  tags          String[]                @default([]) @map("tags")
+  createdAt     DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+  race          Race                    @relation(fields: [raceId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([raceId, rawName], map: "uq_rec_race_raw")
+  @@index([canonicalName(ops: raw("gin_trgm_ops"))], map: "idx_rec_canonical_name_trgm", type: Gin)
+  @@index([distanceKm], map: "idx_rec_distance")
+  @@index([raceId], map: "idx_rec_race_id")
+  @@index([raceId, createdAt], map: "idx_rec_race_id_created_at")
+  @@index([rawName(ops: raw("gin_trgm_ops"))], map: "idx_rec_raw_name_trgm", type: Gin)
+  @@index([tags], map: "idx_rec_tags_gin", type: Gin)
+  @@index([type], map: "idx_rec_type")
+  @@map("race_event_categories")
+}
+
+model Post {
+  id            String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug          String           @unique(map: "uq_posts_slug")
+  title         String
+  excerpt       String?
+  contentMd     String           @map("content_md")
+  coverImageUrl String?          @map("cover_image_url")
+  status        post_status_enum @default(draft)
+  publishedAt   DateTime?        @map("published_at") @db.Timestamptz(6)
+  authorId      String?          @map("author_id") @db.Uuid
+  createdAt     DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime         @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@index([createdAt(sort: Desc)], map: "idx_posts_created_at")
+  @@index([slug(ops: raw("gin_trgm_ops"))], map: "idx_posts_slug_trgm", type: Gin)
+  @@index([status, publishedAt(sort: Desc)], map: "idx_posts_status_published_at")
+  @@index([title(ops: raw("gin_trgm_ops"))], map: "idx_posts_title_trgm", type: Gin)
+  @@map("posts")
+}
+
+enum post_status_enum {
+  draft
+  published
+  archived
+}
+
+enum race_category_type_enum {
   event
   walk
   team
@@ -26,78 +105,8 @@ enum RaceCategoryType {
   other
 }
 
-model Race {
-  id    String @id @default(uuid()) @db.Uuid
-  title String
-
-  // Source
-  sourceUrl String? @unique @map("source_url")
-
-  // Date & Time
-  eventStartAt DateTime @map("event_start_at") @db.Timestamptz(6)
-  eventTimezone String @default("Asia/Seoul") @map("event_timezone")
-  eventTimeRaw String? @map("event_time_raw")
-
-  // Location
-  country String
-  region  String?
-  venue   String?
-
-  // Registration
-  registrationStatus RegistrationStatus @default(unknown) @map("registration_status")
-  registrationStartAt DateTime? @map("registration_start_at") @db.Timestamptz(6)
-  registrationEndAt DateTime? @map("registration_end_at") @db.Timestamptz(6)
-
-  // Raw category cache
-  categoriesRaw String[] @map("categories_raw")
-
-  // Organizer
-  organizer    String
-  organizerRep String? @map("organizer_rep")
-
-  // Contact
-  phone   String?
-  email   String?
-  website String?
-
-  // Images
-  imageUrl String? @map("image_url")
-
-  // Features
-  isFeatured Boolean @default(false) @map("is_featured")
-  isUrgent   Boolean @default(false) @map("is_urgent")
-
-  // Metadata
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
-
-  // Relations
-  categories RaceEventCategory[]
-
-  @@index([eventStartAt])
-  @@index([country, region, eventStartAt])
-  @@index([registrationStatus])
-  @@index([createdAt])
-  @@index([isFeatured])
-  @@index([isUrgent])
-  @@map("races")
-}
-
-model RaceEventCategory {
-  id     String @id @default(uuid()) @db.Uuid
-  raceId String @map("race_id") @db.Uuid
-  race   Race   @relation(fields: [raceId], references: [id], onDelete: Cascade)
-
-  rawName       String @map("raw_name")
-  canonicalName String @map("canonical_name")
-  distanceKm    Decimal? @map("distance_km")
-  type          RaceCategoryType
-  tags          String[] @default([]) @map("tags")
-  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-
-  @@unique([raceId, rawName])
-  @@index([raceId])
-  @@index([type])
-  @@index([distanceKm])
-  @@map("race_event_categories")
+enum registration_status_enum {
+  open
+  closed
+  unknown
 }

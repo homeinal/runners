@@ -85,12 +85,21 @@ export default function AdminDashboardClient({ races }: Props) {
           <h1 className="text-xl font-bold text-gray-900">
             마라톤 대회 관리
           </h1>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            로그아웃
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => router.push("/mrth-manage/posts")}
+              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors border border-gray-200"
+            >
+              글 관리
+            </button>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              로그아웃
+            </button>
+          </div>
         </div>
       </header>
 

@@ -21,9 +21,9 @@ export function HeaderShell({ nav, themeToggle }: HeaderShellProps) {
               MAEDAL
             </h1>
           </Link>
-          <button className="md:hidden p-2" aria-label="氅旊壌 ?搓赴">
+          <button className="md:hidden p-2" aria-label="메뉴보기">
             <Menu size="1em" />
-          </button>
+          </button> 
         </div>
 
         {nav}

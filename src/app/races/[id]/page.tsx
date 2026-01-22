@@ -103,19 +103,8 @@ export default async function RaceDetailPage({ params }: PageProps) {
         {/* Race Detail */}
         <RaceDetail race={race} />
 
-        {/* Footer links */}
-        <footer className="w-full py-8 mt-4 border-t-2 border-black flex flex-col md:flex-row justify-between items-center gap-4 text-sm font-medium uppercase opacity-60">
-          <p>© 2025 매달. All rights reserved.</p>
-          <div className="flex gap-4">
-            <Link href="#" className="hover:underline">
-              개인정보 처리방침
-            </Link>
-            <Link href="#" className="hover:underline">
-              이용약관
-            </Link>
-          </div>
-        </footer>
       </main>
+      <Footer />
     </>
   );
 }
