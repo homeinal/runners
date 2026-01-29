@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import Image from "next/image";
 import { Download, GripVertical, Plus, Trash2, X, ImageIcon } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -95,11 +96,14 @@ function ShoeCard({ shoe, onRemove }: { shoe: ShoeItem; onRemove?: () => void })
           </span>
         </div>
       ) : (
-        <img
+        <Image
           src={shoe.imageUrl}
           alt={shoe.name}
-          className="w-full h-full object-cover"
+          fill
+          sizes="(max-width: 768px) 64px, 80px"
+          className="object-cover"
           onError={() => setImgError(true)}
+          unoptimized={shoe.imageUrl.startsWith("data:")}
         />
       )}
       {onRemove && (
@@ -263,8 +267,8 @@ function AddShoeModal({
             />
           </div>
           {imageUrl && (
-            <div className="w-16 h-16 border-2 border-border-dark rounded-lg overflow-hidden">
-              <img src={imageUrl} alt="미리보기" className="w-full h-full object-cover" />
+            <div className="relative w-16 h-16 border-2 border-border-dark rounded-lg overflow-hidden">
+              <Image src={imageUrl} alt="미리보기" fill className="object-cover" unoptimized />
             </div>
           )}
         </div>
