@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Sans_KR, Spline_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
+import { SessionProvider } from "@/components/layout/SessionProvider";
 import Script from "next/script";
 
 const notoSansKR = Noto_Sans_KR({
@@ -97,12 +98,14 @@ export default function RootLayout({
           strategy="lazyOnload"
           crossOrigin="anonymous"
         />
-        <ThemeProvider>
-          <div className="absolute inset-0 bg-grid-pattern pointer-events-none z-0" />
-          <div className="relative z-10 flex flex-col min-h-screen w-full">
-            {children}
-          </div>
-        </ThemeProvider>
+        <SessionProvider>
+          <ThemeProvider>
+            <div className="absolute inset-0 bg-grid-pattern pointer-events-none z-0" />
+            <div className="relative z-10 flex flex-col min-h-screen w-full">
+              {children}
+            </div>
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

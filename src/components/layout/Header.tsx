@@ -3,6 +3,7 @@
 import { HeaderNav, MobileHeaderNav } from "./HeaderNav";
 import { HeaderShell } from "./HeaderShell";
 import { ThemeToggle } from "./ThemeToggle";
+import { UserMenu, MobileUserMenu } from "./UserMenu";
 
 export function Header() {
   return (
@@ -10,6 +11,8 @@ export function Header() {
       nav={<HeaderNav />}
       mobileNav={({ onNavigate }) => <MobileHeaderNav onNavigate={onNavigate} />}
       themeToggle={<ThemeToggle />}
+      userMenu={<UserMenu />}
+      mobileUserMenu={({ onNavigate }) => <MobileUserMenu onNavigate={onNavigate} />}
     />
   );
 }

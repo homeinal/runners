@@ -87,6 +87,8 @@ ehthumbs.db
 *.db
 *.db-journal
 
+docs/*
+
 # Accidentally created files
 next
 runner@*

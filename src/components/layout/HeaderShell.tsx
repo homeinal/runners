@@ -9,9 +9,11 @@ interface HeaderShellProps {
   nav: ReactNode;
   mobileNav: ReactNode | ((props: { onNavigate: () => void }) => ReactNode);
   themeToggle: ReactNode;
+  userMenu?: ReactNode;
+  mobileUserMenu?: ReactNode | ((props: { onNavigate: () => void }) => ReactNode);
 }
 
-export function HeaderShell({ nav, mobileNav, themeToggle }: HeaderShellProps) {
+export function HeaderShell({ nav, mobileNav, themeToggle, userMenu, mobileUserMenu }: HeaderShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -48,6 +50,7 @@ export function HeaderShell({ nav, mobileNav, themeToggle }: HeaderShellProps) {
             Seoul, KR
           </div>
           {themeToggle}
+          {userMenu}
         </div>
       </div>
 
@@ -60,6 +63,13 @@ export function HeaderShell({ nav, mobileNav, themeToggle }: HeaderShellProps) {
         <div className="px-6 pb-6 pt-2">
           <div className="bg-white dark:bg-background-dark border-4 border-border-dark dark:border-white rounded-3xl p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]">
             {typeof mobileNav === 'function' ? mobileNav({ onNavigate: () => setMobileMenuOpen(false) }) : mobileNav}
+
+            {/* Mobile User Menu */}
+            {mobileUserMenu && (
+              <div className="mt-4 pt-4 border-t-2 border-border-dark dark:border-white">
+                {typeof mobileUserMenu === 'function' ? mobileUserMenu({ onNavigate: () => setMobileMenuOpen(false) }) : mobileUserMenu}
+              </div>
+            )}
 
             {/* Mobile Theme Toggle & Location */}
             <div className="mt-4 pt-4 border-t-2 border-border-dark dark:border-white flex items-center justify-between gap-4">

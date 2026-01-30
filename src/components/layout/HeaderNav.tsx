@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Album, CalendarRange, Medal, Users } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { Album, CalendarRange, Medal, Trophy, Users, User } from "lucide-react";
 
 const BASE_CLS =
   "px-4 md:px-6 py-2 rounded-full font-bold text-sm uppercase flex items-center gap-2 transition-colors whitespace-nowrap";
@@ -31,6 +32,7 @@ function mobileNavCls(active: boolean) {
 
 export function HeaderNav() {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   return (
     <nav className="flex items-center gap-3 bg-white dark:bg-background-dark p-1.5 rounded-full border-2 border-border-dark dark:border-white shadow-(--shadow-neobrutalism-sm) overflow-x-auto max-w-full">
@@ -50,15 +52,26 @@ export function HeaderNav() {
         <Users className="text-lg" size="1em" />
         크루 찾기
       </Link>
+      <Link href="/ranking" scroll={false} className={navCls(pathname === "/ranking")}>
+        <Trophy className="text-lg" size="1em" />
+        랭킹
+      </Link>
       <Link href="/" className={navCls(pathname === "/")} scroll={false}>
         전체 대회
       </Link>
+      {session?.user && (
+        <Link href="/mypage" className={navCls(pathname === "/mypage")} scroll={false}>
+          <User className="text-lg" size="1em" />
+          마이페이지
+        </Link>
+      )}
     </nav>
   );
 }
 
 export function MobileHeaderNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   return (
     <nav className="flex flex-col gap-2">
@@ -78,10 +91,20 @@ export function MobileHeaderNav({ onNavigate }: { onNavigate?: () => void }) {
         <Users size={20} />
         크루 찾기
       </Link>
+      <Link href="/ranking" scroll={false} className={mobileNavCls(pathname === "/ranking")} onClick={onNavigate}>
+        <Trophy size={20} />
+        랭킹
+      </Link>
       <Link href="/" className={mobileNavCls(pathname === "/")} onClick={onNavigate} scroll={false}>
         <CalendarRange size={20} />
         전체 대회
       </Link>
+      {session?.user && (
+        <Link href="/mypage" className={mobileNavCls(pathname === "/mypage")} onClick={onNavigate} scroll={false}>
+          <User size={20} />
+          마이페이지
+        </Link>
+      )}
     </nav>
   );
 }

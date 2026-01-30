@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CrewFinderClient } from "./CrewFinderClient";
+import { AuthGuard } from "@/components/auth/AuthGuard";
 
 export const metadata = {
   title: "러닝 크루 찾기 - 매달",
@@ -10,7 +11,7 @@ export const metadata = {
 
 export default function CrewPage() {
   return (
-    <>
+    <AuthGuard>
       <Header />
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-8 space-y-6">
         <div className="space-y-1">
@@ -24,6 +25,6 @@ export default function CrewPage() {
         <CrewFinderClient />
       </main>
       <Footer />
-    </>
+    </AuthGuard>
   );
 }
