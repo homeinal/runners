@@ -72,7 +72,7 @@ export function RaceDetail({ race }: RaceDetailProps) {
       </Card>
 
       {/* Registration Section */}
-      <section className="bg-primary border-2 border-border-dark shadow-[var(--shadow-neobrutalism)] p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6 w-full text-black dark:text-black">
+      <section className="bg-primary border-2 border-border-dark shadow-(--shadow-neobrutalism) p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6 w-full text-black dark:text-black">
         <div className="flex flex-col gap-4 w-full md:w-auto">
           <div className="flex items-center gap-3">
             <Icon

@@ -6,7 +6,7 @@ import { isAdminAuthenticated } from "@/lib/admin-session";
 import { resolvePublishedAt } from "@/lib/post-utils";
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export async function PUT(request: NextRequest, { params }: Props) {
@@ -14,7 +14,7 @@ export async function PUT(request: NextRequest, { params }: Props) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { slug: currentSlug } = params;
+  const { slug: currentSlug } = await params;
   const {
     title,
     slug,

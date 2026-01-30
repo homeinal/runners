@@ -117,7 +117,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     ];
   }
 
-  // 데이터 조회 (정렬/상태 필터는 메모리에서 처리)
+  // 데이터 조회 - date 정렬은 DB에서 페이지네이션, 나머지는 메모리 처리
+  const canPaginateInDb = sort === "date" && status === "전체";
+  const takeLimit = canPaginateInDb ? RACES_PER_PAGE * page + 1 : undefined;
+
   const [racesRaw, regions] = await Promise.all([
     prisma.race.findMany({
       where,
@@ -125,6 +128,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       include: {
         categories: true,
       },
+      ...(takeLimit ? { take: takeLimit } : {}),
     }),
     getRegions(),
   ]);

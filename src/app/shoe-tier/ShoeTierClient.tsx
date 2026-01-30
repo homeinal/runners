@@ -88,7 +88,7 @@ function ShoeCard({ shoe, onRemove }: { shoe: ShoeItem; onRemove?: () => void })
   const [imgError, setImgError] = useState(false);
 
   return (
-    <div className="relative group w-16 h-16 md:w-20 md:h-20 border-2 border-border-dark dark:border-white bg-white dark:bg-background-dark rounded-lg overflow-hidden flex-shrink-0 shadow-[var(--shadow-neobrutalism-sm)]">
+    <div className="relative group w-16 h-16 md:w-20 md:h-20 border-2 border-border-dark dark:border-white bg-white dark:bg-background-dark rounded-lg overflow-hidden flex-shrink-0 shadow-(--shadow-neobrutalism-sm)">
       {imgError || !shoe.imageUrl ? (
         <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">
           <span className="text-[10px] font-bold text-center leading-tight px-1 text-gray-500">
@@ -226,7 +226,7 @@ function AddShoeModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
       <div
-        className="bg-white dark:bg-background-dark border-4 border-border-dark dark:border-white rounded-xl shadow-[var(--shadow-neobrutalism)] p-6 w-full max-w-md mx-4 space-y-4"
+        className="bg-white dark:bg-background-dark border-4 border-border-dark dark:border-white rounded-xl shadow-(--shadow-neobrutalism) p-6 w-full max-w-md mx-4 space-y-4"
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="text-lg font-black uppercase">운동화 추가</h3>
@@ -276,7 +276,7 @@ function AddShoeModal({
         <div className="flex gap-2 pt-2">
           <button
             onClick={handleSubmit}
-            className="flex-1 py-2.5 bg-primary border-2 border-border-dark rounded-lg font-bold text-sm uppercase shadow-[var(--shadow-neobrutalism-sm)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[var(--shadow-neobrutalism-hover)] transition-all"
+            className="flex-1 py-2.5 bg-primary border-2 border-border-dark rounded-lg font-bold text-sm uppercase shadow-(--shadow-neobrutalism-sm) hover:translate-x-px hover:translate-y-px hover:shadow-(--shadow-neobrutalism-hover) transition-all"
           >
             추가
           </button>
@@ -395,7 +395,7 @@ export function ShoeTierClient() {
 
       {/* ── Admin Tab ─────────────────────────────────────────────────── */}
       {tab === "admin" && (
-        <div className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-xl shadow-[var(--shadow-neobrutalism)] overflow-hidden">
+        <div className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-xl shadow-(--shadow-neobrutalism) overflow-hidden">
           <div className="p-4 border-b-2 border-border-dark dark:border-white bg-primary/20">
             <h2 className="font-black text-lg uppercase">에디터 선정 러닝화 티어</h2>
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
@@ -417,21 +417,21 @@ export function ShoeTierClient() {
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-primary border-2 border-border-dark rounded-lg font-bold text-sm shadow-[var(--shadow-neobrutalism-sm)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[var(--shadow-neobrutalism-hover)] transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 bg-primary border-2 border-border-dark rounded-lg font-bold text-sm shadow-(--shadow-neobrutalism-sm) hover:translate-x-px hover:translate-y-px hover:shadow-(--shadow-neobrutalism-hover) transition-all"
             >
               <Plus size={16} />
               운동화 추가
             </button>
             <button
               onClick={handleDownload}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-lg font-bold text-sm shadow-[var(--shadow-neobrutalism-sm)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[var(--shadow-neobrutalism-hover)] transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-lg font-bold text-sm shadow-(--shadow-neobrutalism-sm) hover:translate-x-px hover:translate-y-px hover:shadow-(--shadow-neobrutalism-hover) transition-all"
             >
               <Download size={16} />
               이미지 저장
             </button>
             <button
               onClick={handleReset}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-lg font-bold text-sm shadow-[var(--shadow-neobrutalism-sm)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[var(--shadow-neobrutalism-hover)] transition-all text-red-500"
+              className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-lg font-bold text-sm shadow-(--shadow-neobrutalism-sm) hover:translate-x-px hover:translate-y-px hover:shadow-(--shadow-neobrutalism-hover) transition-all text-red-500"
             >
               <Trash2 size={16} />
               초기화
@@ -441,7 +441,7 @@ export function ShoeTierClient() {
           {/* Tier table */}
           <div
             ref={tierRef}
-            className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-xl shadow-[var(--shadow-neobrutalism)] overflow-hidden"
+            className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-xl shadow-(--shadow-neobrutalism) overflow-hidden"
           >
             <div className="p-4 border-b-2 border-border-dark dark:border-white bg-primary/20">
               <h2 className="font-black text-lg uppercase">나만의 운동화 티어</h2>
@@ -464,7 +464,7 @@ export function ShoeTierClient() {
 
           {/* Shoe pool */}
           <div
-            className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-xl shadow-[var(--shadow-neobrutalism)] p-4"
+            className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-xl shadow-(--shadow-neobrutalism) p-4"
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDropOnPool}
           >

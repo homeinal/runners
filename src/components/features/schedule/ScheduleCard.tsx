@@ -234,7 +234,7 @@ export function ScheduleCard({
               <Link
                 href={`/races/${race.id}`}
                 prefetch={false}
-                className="w-full bg-primary text-border-dark border-2 border-border-dark py-2 rounded font-black text-xs uppercase shadow-[var(--shadow-neobrutalism-sm)] hover:shadow-[var(--shadow-neobrutalism-active)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-1"
+                className="w-full bg-primary text-border-dark border-2 border-border-dark py-2 rounded font-black text-xs uppercase shadow-(--shadow-neobrutalism-sm) hover:shadow-(--shadow-neobrutalism-active) hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex items-center justify-center gap-1"
               >
                 신청하기
               </Link>

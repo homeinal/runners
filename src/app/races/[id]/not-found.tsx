@@ -15,7 +15,7 @@ export default function NotFound() {
           </p>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 bg-primary text-border-dark border-2 border-border-dark px-6 py-3 rounded-full font-bold uppercase shadow-[var(--shadow-neobrutalism)] hover:shadow-[var(--shadow-neobrutalism-hover)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            className="inline-flex items-center gap-2 bg-primary text-border-dark border-2 border-border-dark px-6 py-3 rounded-full font-bold uppercase shadow-(--shadow-neobrutalism) hover:shadow-(--shadow-neobrutalism-hover) hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
           >
             <Icon name="arrow_back" />
             대회 목록으로 돌아가기

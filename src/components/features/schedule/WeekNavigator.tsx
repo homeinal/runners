@@ -183,7 +183,7 @@ export function WeekNavigator({
 
       <div className="flex items-center gap-3">
         {/* View Mode Toggle */}
-        <div className="bg-white dark:bg-white/5 border-2 border-border-dark dark:border-white rounded-xl p-1 shadow-[var(--shadow-neobrutalism-sm)] flex items-center">
+        <div className="bg-white dark:bg-white/5 border-2 border-border-dark dark:border-white rounded-xl p-1 shadow-(--shadow-neobrutalism-sm) flex items-center">
           <button
             onClick={() => toggleViewMode("week")}
             className={`px-3 py-1.5 text-xs font-black uppercase rounded-lg transition-all ${
@@ -208,7 +208,7 @@ export function WeekNavigator({
 
         {/* Navigator */}
         <div className="relative" ref={calendarRef}>
-          <div className="bg-white dark:bg-white/5 border-2 border-border-dark dark:border-white rounded-xl p-1 shadow-[var(--shadow-neobrutalism-sm)] flex items-center gap-2">
+          <div className="bg-white dark:bg-white/5 border-2 border-border-dark dark:border-white rounded-xl p-1 shadow-(--shadow-neobrutalism-sm) flex items-center gap-2">
             <button
               onClick={() => viewMode === "week" ? navigateWeek("prev") : navigateMonth("prev")}
               className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors"

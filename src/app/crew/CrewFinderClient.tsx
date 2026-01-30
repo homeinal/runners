@@ -137,7 +137,7 @@ function TabButton({
 // ── Profile card ───────────────────────────────────────────────────────
 function ProfileCard({ profile }: { profile: CrewProfile }) {
   return (
-    <div className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-xl shadow-[var(--shadow-neobrutalism)] p-5 hover:shadow-[var(--shadow-neobrutalism-hover)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all space-y-3">
+    <div className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-xl shadow-(--shadow-neobrutalism) p-5 hover:shadow-(--shadow-neobrutalism-hover) hover:translate-x-px hover:translate-y-px transition-all space-y-3">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
@@ -261,7 +261,7 @@ function RegisterForm({ onSubmit }: { onSubmit: (p: CrewProfile) => void }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-xl shadow-[var(--shadow-neobrutalism)] p-6 space-y-5"
+      className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-xl shadow-(--shadow-neobrutalism) p-6 space-y-5"
     >
       <h2 className="font-black text-lg uppercase flex items-center gap-2">
         <Zap size={20} className="text-primary" />
@@ -373,7 +373,7 @@ function RegisterForm({ onSubmit }: { onSubmit: (p: CrewProfile) => void }) {
 
       <button
         type="submit"
-        className="w-full py-3 bg-primary border-2 border-border-dark rounded-lg font-black text-sm uppercase shadow-[var(--shadow-neobrutalism-sm)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[var(--shadow-neobrutalism-hover)] transition-all"
+        className="w-full py-3 bg-primary border-2 border-border-dark rounded-lg font-black text-sm uppercase shadow-(--shadow-neobrutalism-sm) hover:translate-x-px hover:translate-y-px hover:shadow-(--shadow-neobrutalism-hover) transition-all"
       >
         프로필 등록하기
       </button>
@@ -473,7 +473,7 @@ export function CrewFinderClient() {
               </p>
               <button
                 onClick={() => setTab("register")}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary border-2 border-border-dark rounded-lg font-bold text-sm shadow-[var(--shadow-neobrutalism-sm)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[var(--shadow-neobrutalism-hover)] transition-all"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary border-2 border-border-dark rounded-lg font-bold text-sm shadow-(--shadow-neobrutalism-sm) hover:translate-x-px hover:translate-y-px hover:shadow-(--shadow-neobrutalism-hover) transition-all"
               >
                 <Plus size={14} />
                 첫 번째 러너가 되어보세요!

@@ -19,9 +19,9 @@ export function Button({
 
   const variants = {
     primary:
-      "bg-primary text-border-dark shadow-[var(--shadow-neobrutalism)] hover:shadow-[var(--shadow-neobrutalism-hover)] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-[var(--shadow-neobrutalism-active)] active:translate-x-[4px] active:translate-y-[4px]",
+      "bg-primary text-border-dark shadow-(--shadow-neobrutalism) hover:shadow-(--shadow-neobrutalism-hover) hover:translate-x-0.5 hover:translate-y-0.5 active:shadow-(--shadow-neobrutalism-active) active:translate-x-1 active:translate-y-1",
     secondary:
-      "bg-white dark:bg-background-dark text-border-dark dark:text-white dark:border-white shadow-[var(--shadow-neobrutalism)] hover:shadow-[var(--shadow-neobrutalism-hover)] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-[var(--shadow-neobrutalism-active)] active:translate-x-[4px] active:translate-y-[4px]",
+      "bg-white dark:bg-background-dark text-border-dark dark:text-white dark:border-white shadow-(--shadow-neobrutalism) hover:shadow-(--shadow-neobrutalism-hover) hover:translate-x-0.5 hover:translate-y-0.5 active:shadow-(--shadow-neobrutalism-active) active:translate-x-1 active:translate-y-1",
     outline:
       "bg-white dark:bg-transparent text-border-dark dark:text-white dark:border-white hover:bg-border-dark hover:text-white dark:hover:bg-white dark:hover:text-border-dark",
   };

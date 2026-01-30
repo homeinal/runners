@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Sans_KR, Spline_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
+import Script from "next/script";
 
 const notoSansKR = Noto_Sans_KR({
   subsets: ["latin"],
@@ -51,6 +52,17 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     images: ["/OG_image.png"],
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
+  alternates: {
+    canonical: "https://maedal.com",
+  },
 };
 
 export default function RootLayout({
@@ -76,12 +88,15 @@ export default function RootLayout({
           name="google-adsense-account"
           content="ca-pub-3411274862132015"
         />
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3411274862132015"
-     crossOrigin="anonymous"></script>
       </head>
       <body
         className={`${notoSansKR.variable} ${splineSans.variable} font-display bg-background-light dark:bg-background-dark text-border-dark dark:text-background-light min-h-screen flex flex-col relative overflow-x-hidden antialiased`}
       >
+        <Script
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3411274862132015"
+          strategy="lazyOnload"
+          crossOrigin="anonymous"
+        />
         <ThemeProvider>
           <div className="absolute inset-0 bg-grid-pattern pointer-events-none z-0" />
           <div className="relative z-10 flex flex-col min-h-screen w-full">

@@ -1,12 +1,15 @@
 import type {
   Race,
   RaceEventCategory,
-  RegistrationStatus,
-  RaceCategoryType,
+  registration_status_enum,
+  race_category_type_enum,
 } from "@prisma/client";
 
+export type RegistrationStatus = registration_status_enum;
+export type RaceCategoryType = race_category_type_enum;
+
 // Prisma model re-exports
-export type { Race, RaceEventCategory, RegistrationStatus, RaceCategoryType };
+export type { Race, RaceEventCategory };
 
 export type RaceWithCategories = Race & {
   categories: RaceEventCategory[];

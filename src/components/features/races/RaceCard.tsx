@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { RaceWithCategories } from "@/types";
 import { formatDayMonth, getRaceRegistrationStatus, getRaceCategoryNames } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
@@ -19,7 +20,7 @@ export function RaceCard({ race }: RaceCardProps) {
     <Link
       href={`/races/${race.id}`}
       prefetch={false}
-      className="flex flex-col md:flex-row items-center bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-xl shadow-[var(--shadow-neobrutalism)] p-4 gap-4 hover:shadow-[var(--shadow-neobrutalism-hover)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all group cursor-pointer"
+      className="flex flex-col md:flex-row items-center bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-xl shadow-(--shadow-neobrutalism) p-4 gap-4 hover:shadow-(--shadow-neobrutalism-hover) hover:translate-x-px hover:translate-y-px transition-all group cursor-pointer"
     >
       {/* Date */}
       <div className="flex flex-row md:flex-col items-center justify-center gap-1 min-w-[100px] md:border-r-2 border-border-dark/20 dark:border-white/20 pr-4 md:pr-6 md:mr-2">
@@ -34,21 +35,22 @@ export function RaceCard({ race }: RaceCardProps) {
       {/* Image & Info */}
       <div className="flex-1 flex items-center gap-4 w-full">
         {/* Thumbnail */}
-        <div
-          className="size-16 rounded-lg border-2 border-border-dark dark:border-white bg-cover bg-center shrink-0"
-          style={{
-            backgroundImage: race.imageUrl
-              ? `url('${race.imageUrl}')`
-              : undefined,
-            backgroundColor: race.imageUrl ? undefined : "#e5e5e5",
-          }}
-        >
-          {!race.imageUrl && (
-            <div className="size-full flex items-center justify-center">
-              <Icon name="directions_run" className="text-2xl text-gray-400" />
-            </div>
-          )}
-        </div>
+        {race.imageUrl ? (
+          <div className="size-16 rounded-lg border-2 border-border-dark dark:border-white shrink-0 overflow-hidden relative">
+            <Image
+              src={race.imageUrl}
+              alt={race.title}
+              width={64}
+              height={64}
+              className="object-cover w-full h-full"
+              sizes="64px"
+            />
+          </div>
+        ) : (
+          <div className="size-16 rounded-lg border-2 border-border-dark dark:border-white shrink-0 bg-[#e5e5e5] flex items-center justify-center">
+            <Icon name="directions_run" className="text-2xl text-gray-400" />
+          </div>
+        )}
 
         {/* Details */}
         <div className="flex flex-col">

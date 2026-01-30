@@ -141,7 +141,7 @@ export function WheelList({ dayGroups }: WheelListProps) {
                 isActive ? "opacity-100 scale-100 blur-0" : "opacity-40 scale-90 blur-[1px]"
               }`}
             >
-              <div className="w-full max-w-2xl bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-2xl shadow-[var(--shadow-neobrutalism)] p-6 md:p-8 transition-all duration-500">
+              <div className="w-full max-w-2xl bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-2xl shadow-(--shadow-neobrutalism) p-6 md:p-8 transition-all duration-500">
                 {/* Date Header */}
                 <div className="flex items-center justify-between mb-6 border-b-2 border-border-dark dark:border-white/20 pb-4">
                     <div className="flex items-center gap-4">

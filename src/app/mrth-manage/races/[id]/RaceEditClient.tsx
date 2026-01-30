@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import type { RaceWithCategoriesPlain } from "@/types";
 import type {
-  RaceWithCategoriesPlain,
-  RaceCategoryType,
-  RegistrationStatus,
-} from "@/types";
+  race_category_type_enum as RaceCategoryType,
+  registration_status_enum as RegistrationStatus,
+} from "@prisma/client";
 
 interface Props {
   race: RaceWithCategoriesPlain;

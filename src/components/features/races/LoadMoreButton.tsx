@@ -44,7 +44,7 @@ export function LoadMoreButton({
         href={href}
         scroll={false}
         prefetch={false}
-        className="bg-white dark:bg-background-dark text-border-dark dark:text-white border-2 border-border-dark dark:border-white px-8 py-3 rounded-full font-bold text-sm shadow-[var(--shadow-neobrutalism)] hover:shadow-[var(--shadow-neobrutalism-hover)] hover:translate-x-[1px] hover:translate-y-[1px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all uppercase flex items-center gap-2"
+        className="bg-white dark:bg-background-dark text-border-dark dark:text-white border-2 border-border-dark dark:border-white px-8 py-3 rounded-full font-bold text-sm shadow-(--shadow-neobrutalism) hover:shadow-(--shadow-neobrutalism-hover) hover:translate-x-px hover:translate-y-px active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase flex items-center gap-2"
       >
         <RefreshCw size="1em" />
         대회 더 보기

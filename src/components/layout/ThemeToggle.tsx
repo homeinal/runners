@@ -20,7 +20,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="size-10 bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-full flex items-center justify-center shadow-[var(--shadow-neobrutalism-sm)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[var(--shadow-neobrutalism-hover)] transition-all"
+      className="size-10 bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-full flex items-center justify-center shadow-(--shadow-neobrutalism-sm) hover:translate-x-px hover:translate-y-px hover:shadow-(--shadow-neobrutalism-hover) transition-all"
       aria-label={theme === "light" ? "다크 모드로 전환" : "라이트 모드로 전환"}
     >
       <IconComponent

@@ -12,32 +12,74 @@ const ACTIVE_CLS =
 const INACTIVE_CLS =
   BASE_CLS + " hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500";
 
+const MOBILE_BASE_CLS =
+  "w-full px-4 py-3 rounded-2xl font-bold text-sm uppercase flex items-center gap-3 transition-colors";
+const MOBILE_ACTIVE_CLS =
+  MOBILE_BASE_CLS +
+  " bg-primary border-2 border-border-dark shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-border-dark";
+const MOBILE_INACTIVE_CLS =
+  MOBILE_BASE_CLS +
+  " hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 border-2 border-transparent";
+
 function navCls(active: boolean) {
   return active ? ACTIVE_CLS : INACTIVE_CLS;
+}
+
+function mobileNavCls(active: boolean) {
+  return active ? MOBILE_ACTIVE_CLS : MOBILE_INACTIVE_CLS;
 }
 
 export function HeaderNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center gap-3 bg-white dark:bg-background-dark p-1.5 rounded-full border-2 border-border-dark dark:border-white shadow-[var(--shadow-neobrutalism-sm)] overflow-x-auto max-w-full">
-      <Link href="/weekly" className={navCls(pathname === "/weekly")}>
+    <nav className="flex items-center gap-3 bg-white dark:bg-background-dark p-1.5 rounded-full border-2 border-border-dark dark:border-white shadow-(--shadow-neobrutalism-sm) overflow-x-auto max-w-full">
+      <Link href="/weekly" className={navCls(pathname === "/weekly")} scroll={false}>
         <CalendarRange className="text-lg" size="1em" />
         주간 접수
       </Link>
-      <Link href="/posts" className={navCls(pathname === "/posts")}>
+      <Link href="/posts" className={navCls(pathname === "/posts")} scroll={false}>
         <Album className="text-lg" size="1em" />
         컬럼
       </Link>
-      <Link href="/shoe-tier" className={navCls(pathname === "/shoe-tier")}>
+      <Link href="/shoe-tier" className={navCls(pathname === "/shoe-tier")} scroll={false}>
         <Medal className="text-lg" size="1em" />
         신발 티어
       </Link>
-      <Link href="/crew" className={navCls(pathname === "/crew")}>
+      <Link href="/crew" className={navCls(pathname === "/crew")} scroll={false}>
         <Users className="text-lg" size="1em" />
         크루 찾기
       </Link>
-      <Link href="/" className={navCls(pathname === "/")}>
+      <Link href="/" className={navCls(pathname === "/")} scroll={false}>
+        전체 대회
+      </Link>
+    </nav>
+  );
+}
+
+export function MobileHeaderNav({ onNavigate }: { onNavigate?: () => void }) {
+  const pathname = usePathname();
+
+  return (
+    <nav className="flex flex-col gap-2">
+      <Link href="/weekly" className={mobileNavCls(pathname === "/weekly")} onClick={onNavigate} scroll={false}>
+        <CalendarRange size={20} />
+        주간 접수
+      </Link>
+      <Link href="/posts" className={mobileNavCls(pathname === "/posts")} onClick={onNavigate} scroll={false}>
+        <Album size={20} />
+        컬럼
+      </Link>
+      <Link href="/shoe-tier" className={mobileNavCls(pathname === "/shoe-tier")} onClick={onNavigate} scroll={false}>
+        <Medal size={20} />
+        신발 티어
+      </Link>
+      <Link href="/crew" className={mobileNavCls(pathname === "/crew")} onClick={onNavigate} scroll={false}>
+        <Users size={20} />
+        크루 찾기
+      </Link>
+      <Link href="/" className={mobileNavCls(pathname === "/")} onClick={onNavigate} scroll={false}>
+        <CalendarRange size={20} />
         전체 대회
       </Link>
     </nav>
