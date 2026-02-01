@@ -86,7 +86,7 @@ export function HeaderNav() {
         </button>
 
         {dropdownOpen && (
-          <div className="absolute top-full mt-2 right-0 bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-xl shadow-(--shadow-neobrutalism) min-w-[180px] py-2 z-50">
+          <div className="absolute top-full mt-2 right-0 bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-none shadow-(--shadow-neobrutalism) min-w-[180px] py-2 z-50">
             <Link
               href="/posts"
               className="w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-2 font-bold text-sm uppercase transition-colors"
