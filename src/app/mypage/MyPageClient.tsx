@@ -78,7 +78,7 @@ export function MyPageClient({ records: initialRecords }: MyPageClientProps) {
           </p>
           <Link
             href="/ranking/upload"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-primary-light dark:bg-primary-dark text-white font-black uppercase tracking-tight border-2 border-border-dark dark:border-white rounded-xl shadow-(--shadow-neobrutalism) hover:shadow-(--shadow-neobrutalism-hover) hover:translate-x-px hover:translate-y-px transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-primary-light dark:bg-primary-dark text-border-dark dark:text-white font-black uppercase tracking-tight border-2 border-border-dark dark:border-white rounded-xl shadow-(--shadow-neobrutalism) hover:shadow-(--shadow-neobrutalism-hover) hover:translate-x-px hover:translate-y-px transition-all"
           >
             <Plus className="size-5" />
             첫 기록 업로드
