@@ -45,10 +45,6 @@ export function HeaderShell({ nav, mobileNav, themeToggle, userMenu, mobileUserM
 
         {/* Desktop Right Side */}
         <div className="hidden md:flex items-center gap-4">
-          <div className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-full px-4 py-1.5 font-bold text-sm shadow-(--shadow-neobrutalism-sm) flex items-center gap-2 hover:bg-gray-50 cursor-pointer">
-            <span className="size-2 rounded-full bg-green-500 animate-pulse" />
-            Seoul, KR
-          </div>
           {themeToggle}
           {userMenu}
         </div>
@@ -71,12 +67,8 @@ export function HeaderShell({ nav, mobileNav, themeToggle, userMenu, mobileUserM
               </div>
             )}
 
-            {/* Mobile Theme Toggle & Location */}
-            <div className="mt-4 pt-4 border-t-2 border-border-dark dark:border-white flex items-center justify-between gap-4">
-              <div className="bg-background-light dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-full px-4 py-1.5 font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] flex items-center gap-2">
-                <span className="size-2 rounded-full bg-green-500 animate-pulse" />
-                Seoul, KR
-              </div>
+            {/* Mobile Theme Toggle */}
+            <div className="mt-4 pt-4 border-t-2 border-border-dark dark:border-white flex items-center justify-end">
               {themeToggle}
             </div>
           </div>
