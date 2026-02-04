@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   MapPin,
   Users,
@@ -13,19 +13,24 @@ import {
   Heart,
   Zap,
   Target,
+  Edit,
+  Trash2,
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface CrewProfile {
   id: string;
+  userId: string;
   nickname: string;
   region: string;
   pace: string;
-  distance: string;
-  days: string[];
-  time: string;
-  message: string;
+  message: string | null;
   tags: string[];
+  availableDays: string[];
+  preferredTime: string | null;
+  user: {
+    image: string | null;
+  };
   createdAt: string;
 }
 
@@ -43,69 +48,6 @@ const REGIONS = [
   "대전",
   "광주",
   "인천",
-];
-
-const SAMPLE_PROFILES: CrewProfile[] = [
-  {
-    id: "1",
-    nickname: "달리는 곰",
-    region: "서울 마포/여의도",
-    pace: "5:30~6:00",
-    distance: "10km",
-    days: ["화", "목", "토"],
-    time: "저녁 7시",
-    message: "한강 마포대교 근처에서 같이 달릴 분! 초보도 환영합니다 😊",
-    tags: ["초보환영", "한강러닝", "10K"],
-    createdAt: "2025-01-28",
-  },
-  {
-    id: "2",
-    nickname: "서브4 도전중",
-    region: "서울 송파/잠실",
-    pace: "5:00~5:30",
-    distance: "하프마라톤",
-    days: ["수", "토", "일"],
-    time: "아침 6시",
-    message: "잠실 석촌호수 주변에서 아침 러닝하실 분 구합니다. 서브4 목표로 같이 훈련해요!",
-    tags: ["서브4", "아침러닝", "하프"],
-    createdAt: "2025-01-27",
-  },
-  {
-    id: "3",
-    nickname: "느긋한 러너",
-    region: "서울 강남",
-    pace: "6:30~7:00",
-    distance: "5km",
-    days: ["월", "수", "금"],
-    time: "저녁 8시",
-    message: "양재천에서 천천히 달려요. 대화하면서 편하게!",
-    tags: ["초보환영", "양재천", "5K"],
-    createdAt: "2025-01-26",
-  },
-  {
-    id: "4",
-    nickname: "트레일 매니아",
-    region: "경기 분당/판교",
-    pace: "6:00~6:30",
-    distance: "15km+",
-    days: ["토", "일"],
-    time: "아침 7시",
-    message: "주말에 분당 탄천이나 불곡산 트레일 같이 뛰실 분!",
-    tags: ["트레일", "주말러닝", "중급"],
-    createdAt: "2025-01-25",
-  },
-  {
-    id: "5",
-    nickname: "마라톤 입문자",
-    region: "부산",
-    pace: "7:00~7:30",
-    distance: "5km",
-    days: ["화", "목"],
-    time: "저녁 6시30분",
-    message: "해운대 해변을 따라 달려요. 뛰기 시작한 지 한 달! 같이 시작하실 분?",
-    tags: ["입문자", "해운대", "바다러닝"],
-    createdAt: "2025-01-24",
-  },
 ];
 
 const DAY_OPTIONS = ["월", "화", "수", "목", "금", "토", "일"];
@@ -135,27 +77,63 @@ function TabButton({
 }
 
 // ── Profile card ───────────────────────────────────────────────────────
-function ProfileCard({ profile }: { profile: CrewProfile }) {
+function ProfileCard({
+  profile,
+  isMyProfile,
+  onEdit,
+  onDelete,
+}: {
+  profile: CrewProfile;
+  isMyProfile?: boolean;
+  onEdit?: () => void;
+  onDelete?: () => void;
+}) {
   return (
     <div className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-xl shadow-(--shadow-neobrutalism) p-5 hover:shadow-(--shadow-neobrutalism-hover) hover:translate-x-px hover:translate-y-px transition-all space-y-3">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="size-10 bg-primary border-2 border-border-dark rounded-full flex items-center justify-center font-black text-sm">
-            {profile.nickname[0]}
-          </div>
+          {profile.user.image ? (
+            <img
+              src={profile.user.image}
+              alt={profile.nickname}
+              className="size-10 bg-primary border-2 border-border-dark rounded-full object-cover"
+            />
+          ) : (
+            <div className="size-10 bg-primary border-2 border-border-dark rounded-full flex items-center justify-center font-black text-sm">
+              {profile.nickname[0]}
+            </div>
+          )}
           <div>
-            <h3 className="font-bold text-base">{profile.nickname}</h3>
+            <h3 className="font-bold text-base">
+              {profile.nickname}
+              {isMyProfile && (
+                <span className="ml-2 text-xs bg-primary/30 px-2 py-0.5 rounded-full border border-border-dark/20">
+                  내 프로필
+                </span>
+              )}
+            </h3>
             <div className="flex items-center gap-1 text-xs text-gray-500">
               <MapPin size={12} />
               {profile.region}
             </div>
           </div>
         </div>
+        {isMyProfile && (
+          <div className="flex gap-1">
+            <button
+              onClick={onDelete}
+              className="p-1.5 rounded-lg border-2 border-border-dark hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+              title="삭제"
+            >
+              <Trash2 size={14} className="text-red-500" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2">
         <div className="bg-gray-50 dark:bg-white/5 border border-border-dark/20 dark:border-white/20 rounded-lg px-3 py-2 text-center">
           <div className="text-[10px] uppercase font-bold text-gray-400 mb-0.5">
             페이스
@@ -164,15 +142,11 @@ function ProfileCard({ profile }: { profile: CrewProfile }) {
         </div>
         <div className="bg-gray-50 dark:bg-white/5 border border-border-dark/20 dark:border-white/20 rounded-lg px-3 py-2 text-center">
           <div className="text-[10px] uppercase font-bold text-gray-400 mb-0.5">
-            거리
-          </div>
-          <div className="text-sm font-bold">{profile.distance}</div>
-        </div>
-        <div className="bg-gray-50 dark:bg-white/5 border border-border-dark/20 dark:border-white/20 rounded-lg px-3 py-2 text-center">
-          <div className="text-[10px] uppercase font-bold text-gray-400 mb-0.5">
             시간
           </div>
-          <div className="text-sm font-bold">{profile.time}</div>
+          <div className="text-sm font-bold">
+            {profile.preferredTime || "-"}
+          </div>
         </div>
       </div>
 
@@ -184,7 +158,7 @@ function ProfileCard({ profile }: { profile: CrewProfile }) {
             <span
               key={d}
               className={`size-7 rounded-full text-xs font-bold flex items-center justify-center border ${
-                profile.days.includes(d)
+                profile.availableDays.includes(d)
                   ? "bg-primary border-border-dark text-border-dark"
                   : "bg-gray-100 dark:bg-gray-800 border-transparent text-gray-300 dark:text-gray-600"
               }`}
@@ -196,35 +170,50 @@ function ProfileCard({ profile }: { profile: CrewProfile }) {
       </div>
 
       {/* Message */}
-      <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-        <MessageCircle
-          size={14}
-          className="inline mr-1 text-gray-400 relative -top-px"
-        />
-        {profile.message}
-      </p>
+      {profile.message && (
+        <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+          <MessageCircle
+            size={14}
+            className="inline mr-1 text-gray-400 relative -top-px"
+          />
+          {profile.message}
+        </p>
+      )}
 
       {/* Tags */}
-      <div className="flex flex-wrap gap-1.5">
-        {profile.tags.map((tag) => (
-          <span
-            key={tag}
-            className="bg-primary/30 text-border-dark dark:text-white px-2.5 py-0.5 text-xs font-bold rounded-full border border-border-dark/20"
-          >
-            #{tag}
-          </span>
-        ))}
-      </div>
+      {profile.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {profile.tags.map((tag) => (
+            <span
+              key={tag}
+              className="bg-primary/30 text-border-dark dark:text-white px-2.5 py-0.5 text-xs font-bold rounded-full border border-border-dark/20"
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
 // ── Register form ──────────────────────────────────────────────────────
-function RegisterForm({ onSubmit }: { onSubmit: (p: CrewProfile) => void }) {
+function RegisterForm({
+  onSubmit,
+}: {
+  onSubmit: (data: {
+    nickname: string;
+    region: string;
+    pace: string;
+    message: string;
+    tags: string[];
+    availableDays: string[];
+    preferredTime: string;
+  }) => void;
+}) {
   const [nickname, setNickname] = useState("");
   const [region, setRegion] = useState(REGIONS[1]);
   const [pace, setPace] = useState("");
-  const [distance, setDistance] = useState("");
   const [days, setDays] = useState<string[]>([]);
   const [time, setTime] = useState("");
   const [message, setMessage] = useState("");
@@ -239,19 +228,16 @@ function RegisterForm({ onSubmit }: { onSubmit: (p: CrewProfile) => void }) {
     e.preventDefault();
     if (!nickname.trim() || !pace.trim()) return;
     onSubmit({
-      id: `new-${Date.now()}`,
       nickname: nickname.trim(),
       region,
       pace,
-      distance,
-      days,
-      time,
-      message,
+      message: message.trim(),
       tags: tags
         .split(",")
         .map((t) => t.trim())
         .filter(Boolean),
-      createdAt: new Date().toISOString().slice(0, 10),
+      availableDays: days,
+      preferredTime: time.trim(),
     });
   };
 
@@ -303,16 +289,6 @@ function RegisterForm({ onSubmit }: { onSubmit: (p: CrewProfile) => void }) {
             placeholder="5:30~6:00"
             className={inputClass}
             required
-          />
-        </div>
-        <div className="space-y-1.5">
-          <label className="block text-sm font-bold">주 거리</label>
-          <input
-            type="text"
-            value={distance}
-            onChange={(e) => setDistance(e.target.value)}
-            placeholder="10km"
-            className={inputClass}
           />
         </div>
         <div className="space-y-1.5">
@@ -386,23 +362,102 @@ export function CrewFinderClient() {
   const [tab, setTab] = useState<"find" | "register">("find");
   const [region, setRegion] = useState("전체");
   const [search, setSearch] = useState("");
-  const [profiles, setProfiles] = useState<CrewProfile[]>(SAMPLE_PROFILES);
+  const [selectedDay, setSelectedDay] = useState<string>("");
+  const [profiles, setProfiles] = useState<CrewProfile[]>([]);
+  const [myProfile, setMyProfile] = useState<CrewProfile | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = profiles.filter((p) => {
-    if (region !== "전체" && p.region !== region) return false;
-    if (
-      search &&
-      !p.nickname.includes(search) &&
-      !p.message.includes(search) &&
-      !p.tags.some((t) => t.includes(search))
-    )
-      return false;
-    return true;
-  });
+  // Fetch profiles from API
+  const fetchProfiles = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (region && region !== "전체") params.append("region", region);
+      if (search) params.append("search", search);
+      if (selectedDay) params.append("day", selectedDay);
 
-  const handleRegister = (profile: CrewProfile) => {
-    setProfiles((prev) => [profile, ...prev]);
-    setTab("find");
+      const res = await fetch(`/api/crew/profiles?${params}`);
+      const data = await res.json();
+      setProfiles(data);
+    } catch (error) {
+      console.error("Failed to fetch profiles:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch my profile
+  const fetchMyProfile = async () => {
+    try {
+      const res = await fetch("/api/crew/my-profile");
+      if (res.ok) {
+        const data = await res.json();
+        setMyProfile(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch my profile:", error);
+    }
+  };
+
+  // Load data on mount and when filters change
+  useEffect(() => {
+    fetchProfiles();
+  }, [region, search, selectedDay]);
+
+  useEffect(() => {
+    fetchMyProfile();
+  }, []);
+
+  const handleRegister = async (formData: {
+    nickname: string;
+    region: string;
+    pace: string;
+    message: string;
+    tags: string[];
+    availableDays: string[];
+    preferredTime: string;
+  }) => {
+    try {
+      const res = await fetch("/api/crew/profiles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (res.ok) {
+        const newProfile = await res.json();
+        setMyProfile(newProfile);
+        await fetchProfiles();
+        setTab("find");
+      } else {
+        const error = await res.json();
+        alert(error.error || "등록에 실패했습니다");
+      }
+    } catch (error) {
+      console.error("Failed to register profile:", error);
+      alert("등록 중 오류가 발생했습니다");
+    }
+  };
+
+  const handleDeleteProfile = async () => {
+    if (!myProfile) return;
+    if (!confirm("프로필을 삭제하시겠습니까?")) return;
+
+    try {
+      const res = await fetch(`/api/crew/profiles/${myProfile.id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setMyProfile(null);
+        await fetchProfiles();
+      } else {
+        alert("삭제에 실패했습니다");
+      }
+    } catch (error) {
+      console.error("Failed to delete profile:", error);
+      alert("삭제 중 오류가 발생했습니다");
+    }
   };
 
   return (
@@ -413,18 +468,34 @@ export function CrewFinderClient() {
           <Users size={14} className="inline mr-1.5 relative -top-px" />
           러닝 친구 찾기
         </TabButton>
-        <TabButton
-          active={tab === "register"}
-          onClick={() => setTab("register")}
-        >
-          <Plus size={14} className="inline mr-1.5 relative -top-px" />
-          프로필 등록
-        </TabButton>
+        {!myProfile && (
+          <TabButton
+            active={tab === "register"}
+            onClick={() => setTab("register")}
+          >
+            <Plus size={14} className="inline mr-1.5 relative -top-px" />
+            프로필 등록
+          </TabButton>
+        )}
       </div>
 
       {/* ── Find tab ──────────────────────────────────────────────── */}
       {tab === "find" && (
         <div className="space-y-5">
+          {/* My Profile Section */}
+          {myProfile && (
+            <div className="space-y-2">
+              <h3 className="text-sm font-bold uppercase text-gray-500">
+                내 프로필
+              </h3>
+              <ProfileCard
+                profile={myProfile}
+                isMyProfile={true}
+                onDelete={handleDeleteProfile}
+              />
+            </div>
+          )}
+
           {/* Filters */}
           <div className="flex flex-col md:flex-row gap-3">
             <div className="relative flex-1">
@@ -451,40 +522,69 @@ export function CrewFinderClient() {
                 </option>
               ))}
             </select>
+            <select
+              value={selectedDay}
+              onChange={(e) => setSelectedDay(e.target.value)}
+              className="border-2 border-border-dark dark:border-white rounded-lg px-3 py-2.5 text-sm font-bold bg-white dark:bg-background-dark focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="">모든 요일</option>
+              {DAY_OPTIONS.map((d) => (
+                <option key={d} value={d}>
+                  {d}요일
+                </option>
+              ))}
+            </select>
           </div>
 
-          {/* Results count */}
-          <p className="text-sm text-gray-500 font-bold">
-            {filtered.length}명의 러너
-          </p>
-
-          {/* Profile grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filtered.map((p) => (
-              <ProfileCard key={p.id} profile={p} />
-            ))}
-          </div>
-
-          {filtered.length === 0 && (
-            <div className="text-center py-12 space-y-3">
-              <Target size={48} className="mx-auto text-gray-300" />
-              <p className="text-gray-400 font-bold">
-                조건에 맞는 러너가 없습니다.
-              </p>
-              <button
-                onClick={() => setTab("register")}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary border-2 border-border-dark rounded-lg font-bold text-sm shadow-(--shadow-neobrutalism-sm) hover:translate-x-px hover:translate-y-px hover:shadow-(--shadow-neobrutalism-hover) transition-all"
-              >
-                <Plus size={14} />
-                첫 번째 러너가 되어보세요!
-              </button>
+          {/* Loading state */}
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 font-bold">로딩 중...</p>
             </div>
+          ) : (
+            <>
+              {/* Results count */}
+              <p className="text-sm text-gray-500 font-bold">
+                {profiles.length}명의 러너
+              </p>
+
+              {/* Profile grid */}
+              {profiles.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {profiles.map((p) => (
+                    <ProfileCard
+                      key={p.id}
+                      profile={p}
+                      isMyProfile={false}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 space-y-3">
+                  <Target size={48} className="mx-auto text-gray-300" />
+                  <p className="text-gray-400 font-bold">
+                    조건에 맞는 러너가 없습니다.
+                  </p>
+                  {!myProfile && (
+                    <button
+                      onClick={() => setTab("register")}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary border-2 border-border-dark rounded-lg font-bold text-sm shadow-(--shadow-neobrutalism-sm) hover:translate-x-px hover:translate-y-px hover:shadow-(--shadow-neobrutalism-hover) transition-all"
+                    >
+                      <Plus size={14} />
+                      첫 번째 러너가 되어보세요!
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
 
       {/* ── Register tab ──────────────────────────────────────────── */}
-      {tab === "register" && <RegisterForm onSubmit={handleRegister} />}
+      {tab === "register" && !myProfile && (
+        <RegisterForm onSubmit={handleRegister} />
+      )}
     </div>
   );
 }

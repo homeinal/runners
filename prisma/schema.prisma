@@ -92,16 +92,17 @@ model Post {
 // ─── NextAuth Models ───────────────────────────────────────
 
 model User {
-  id            String    @id @default(cuid())
+  id            String        @id @default(cuid())
   name          String?
-  email         String    @unique
-  emailVerified DateTime? @map("email_verified")
+  email         String        @unique
+  emailVerified DateTime?     @map("email_verified")
   image         String?
   accounts      Account[]
   sessions      Session[]
   runRecords    RunRecord[]
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
+  crewProfile   CrewProfile?
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
 
   @@map("users")
 }
@@ -142,6 +143,27 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+// ─── Crew Profiles ────────────────────────────────────────
+
+model CrewProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique @map("user_id")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nickname      String
+  region        String
+  pace          String
+  message       String?
+  tags          String[] @default([])
+  availableDays String[] @default([]) @map("available_days")
+  preferredTime String?  @map("preferred_time")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([region], map: "idx_crew_profiles_region")
+  @@index([createdAt], map: "idx_crew_profiles_created_at")
+  @@map("crew_profiles")
 }
 
 // ─── Running Records ──────────────────────────────────────

@@ -7,6 +7,9 @@ import { Header } from "@/components/layout/Header";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import type { Metadata } from "next";
 
 const formatTimestamp = (value?: Date | string | null) => {
   if (!value) return null;
@@ -21,6 +24,34 @@ export async function generateStaticParams() {
     select: { slug: true },
   });
   return posts.map((post) => ({ id: post.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const post = await prisma.post.findUnique({
+    where: { slug: id },
+    select: { title: true, contentMd: true, coverImageUrl: true, status: true },
+  });
+
+  if (!post || post.status !== "published") {
+    return { title: "포스트를 찾을 수 없습니다" };
+  }
+
+  const description = post.contentMd.slice(0, 160).replace(/[#*`]/g, "");
+
+  return {
+    title: `${post.title} - 매달`,
+    description,
+    openGraph: {
+      title: post.title,
+      description,
+      images: post.coverImageUrl ? [post.coverImageUrl] : [],
+    },
+  };
 }
 
 export default async function PostDetail({
@@ -78,8 +109,12 @@ export default async function PostDetail({
         </div>
 
         {/* Content */}
-        <article className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-2xl shadow-(--shadow-neobrutalism) p-6 sm:p-8 text-base leading-relaxed whitespace-pre-line">
-          {post.contentMd}
+        <article className="bg-white dark:bg-background-dark border-2 border-border-dark dark:border-white rounded-2xl shadow-(--shadow-neobrutalism) p-6 sm:p-8">
+          <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-black prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:border-3 prose-img:border-black">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {post.contentMd}
+            </ReactMarkdown>
+          </div>
         </article>
       </main>
       <Footer />
