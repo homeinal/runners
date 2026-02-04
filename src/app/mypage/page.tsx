@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { prisma } from "@/lib/prisma";
 import { MyPageClient } from "./MyPageClient";
+import { SettingsSection } from "./SettingsSection";
 
 export const metadata = {
   title: "마이페이지 - 매달",
@@ -14,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 export default async function MyPage() {
   const session = await auth();
-  if (!session?.user) redirect("/login");
+  if (!session?.user?.id) redirect("/login");
 
   const records = await prisma.runRecord.findMany({
     where: { userId: session.user.id },
@@ -73,6 +74,14 @@ export default async function MyPage() {
             </div>
           ))}
         </div>
+
+        {/* Settings Section */}
+        <SettingsSection user={{
+          id: session.user.id,
+          name: session.user.name ?? null,
+          email: session.user.email ?? null,
+          image: session.user.image ?? null,
+        }} />
 
         {/* History */}
         <MyPageClient records={serializedRecords} />
