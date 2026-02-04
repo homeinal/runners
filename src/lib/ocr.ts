@@ -1,3 +1,8 @@
+import OpenAI from 'openai';
+import { zodTextFormat } from 'openai/helpers/zod';
+import { z } from 'zod';
+import { readFile } from 'fs/promises';
+
 interface RunData {
   distanceKm: number | null;
   paceSeconds: number | null;
@@ -6,17 +11,13 @@ interface RunData {
   rawText: string;
 }
 
-interface VisionApiResponse {
-  responses: Array<{
-    textAnnotations?: Array<{
-      description: string;
-    }>;
-    error?: {
-      code: number;
-      message: string;
-    };
-  }>;
-}
+const RunDataSchema = z.object({
+  distanceKm: z.number().nullable(),
+  paceSeconds: z.number().nullable(),
+  durationSeconds: z.number().nullable(),
+  calories: z.number().nullable(),
+  rawText: z.string(),
+});
 
 /**
  * Parse extracted OCR text to find running metrics
@@ -83,54 +84,87 @@ export function parseOcrText(text: string): Omit<RunData, "rawText"> {
 }
 
 /**
- * Extract running data from an image using Google Cloud Vision API
+ * Convert a file path or URL to a base64 data URL
  */
-export async function extractRunData(imageUrl: string): Promise<RunData> {
-  const apiKey = process.env.GOOGLE_CLOUD_VISION_API_KEY;
-
-  if (!apiKey) {
-    throw new Error("GOOGLE_CLOUD_VISION_API_KEY environment variable is not set");
+async function imageToBase64(imageUrl: string): Promise<string> {
+  // Already a data URL
+  if (imageUrl.startsWith('data:')) {
+    return imageUrl;
   }
 
-  const visionApiUrl = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
+  // File path - read and convert to base64
+  if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+    const buffer = await readFile(imageUrl);
+    const base64 = buffer.toString('base64');
+    const mimeType = imageUrl.endsWith('.png') ? 'image/png' : 'image/jpeg';
+    return `data:${mimeType};base64,${base64}`;
+  }
 
-  const requestBody = {
-    requests: [
+  // Return URL as-is for OpenAI to fetch
+  return imageUrl;
+}
+
+/**
+ * Extract running data from an image using OpenAI gpt-4o-mini
+ */
+export async function extractRunData(imageUrl: string): Promise<RunData> {
+  const apiKey = process.env.OPENAI_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY environment variable is not set");
+  }
+
+  const openai = new OpenAI({ apiKey });
+
+  // Convert image to base64 if needed
+  const imageData = await imageToBase64(imageUrl);
+
+  const systemPrompt = `You are an expert at extracting running metrics from screenshots.
+
+Extract the following data from running app screenshots:
+- Distance in kilometers (e.g., 5.32, 10.0)
+- Pace per km in total seconds (e.g., 5'30" = 330 seconds, "5분 30초" = 330 seconds)
+- Total duration in seconds (e.g., 1:15:30 = 4530 seconds, "1시간 15분" = 4500 seconds)
+- Calories burned
+
+Handle both English and Korean text:
+- Distance: "km", "킬로미터"
+- Pace: "5'30\"", "5:30", "5분 30초"
+- Duration: "1:15:30", "1시간 15분 30초"
+- Calories: "kcal", "칼로리"
+
+Return null for any metric not found. Include all text you can see in rawText.`;
+
+  const response = await openai.responses.parse({
+    model: 'gpt-4o-mini',
+    input: [
       {
-        image: {
-          source: {
-            imageUri: imageUrl,
-          },
-        },
-        features: [
+        role: 'system',
+        content: systemPrompt,
+      },
+      {
+        role: 'user',
+        content: [
           {
-            type: "TEXT_DETECTION",
+            type: 'input_image',
+            image_url: imageData,
+            detail: 'high',
+          },
+          {
+            type: 'input_text',
+            text: 'Extract running metrics from this screenshot.',
           },
         ],
       },
     ],
-  };
-
-  const response = await fetch(visionApiUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+    text: {
+      format: zodTextFormat(RunDataSchema, 'run_data'),
     },
-    body: JSON.stringify(requestBody),
   });
 
-  if (!response.ok) {
-    throw new Error(`Vision API request failed: ${response.status} ${response.statusText}`);
-  }
+  const result = response.output_parsed;
 
-  const data: VisionApiResponse = await response.json();
-
-  if (data.responses[0]?.error) {
-    throw new Error(`Vision API error: ${data.responses[0].error.message}`);
-  }
-
-  const textAnnotations = data.responses[0]?.textAnnotations;
-  if (!textAnnotations || textAnnotations.length === 0) {
+  if (!result) {
     return {
       distanceKm: null,
       paceSeconds: null,
@@ -140,12 +174,5 @@ export async function extractRunData(imageUrl: string): Promise<RunData> {
     };
   }
 
-  // First annotation contains all detected text
-  const rawText = textAnnotations[0].description;
-  const parsedData = parseOcrText(rawText);
-
-  return {
-    ...parsedData,
-    rawText,
-  };
+  return result as RunData;
 }
